@@ -3,6 +3,9 @@ import { BrainBar } from "@/components/BrainBar";
 import { TaskCard } from "@/components/TaskCard";
 import { DomainProgressRing } from "@/components/DomainProgressRing";
 import { TaskDrillDown } from "@/components/TaskDrillDown";
+import { DailyBriefing } from "@/components/DailyBriefing";
+import { MomentumScore } from "@/components/MomentumScore";
+import { TaskAgingAlert } from "@/components/TaskAgingAlert";
 import { supabase } from "@/integrations/supabase/client";
 import { Command } from "lucide-react";
 
@@ -62,6 +65,17 @@ const Index = () => {
         {/* Brain Bar */}
         <section>
           <BrainBar onTaskCreated={loadTopTasks} />
+        </section>
+
+        {/* Daily Briefing */}
+        <section>
+          <DailyBriefing />
+        </section>
+
+        {/* Momentum & Aging Alerts */}
+        <section className="grid md:grid-cols-2 gap-6">
+          <MomentumScore />
+          <TaskAgingAlert />
         </section>
 
         {/* Top 3 Tasks */}
