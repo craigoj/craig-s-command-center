@@ -4,10 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { Sparkles, Loader2, Calendar, Target } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import { ContextLinker } from "@/components/ContextLinker";
 
 interface TaskDrillDownProps {
   taskId: string | null;
@@ -234,6 +236,13 @@ export const TaskDrillDown = ({ taskId, isOpen, onClose, onTaskUpdated }: TaskDr
                 No steps yet. Generate steps using AI to get started.
               </p>
             )}
+          </div>
+
+          {/* Context Linker */}
+          <Separator className="my-6" />
+          <div className="space-y-4">
+            <h3 className="font-semibold">Related Knowledge</h3>
+            <ContextLinker taskId={taskId!} onLinked={loadTask} />
           </div>
         </div>
       </DialogContent>

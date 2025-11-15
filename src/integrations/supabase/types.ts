@@ -129,6 +129,42 @@ export type Database = {
           },
         ]
       }
+      task_knowledge_links: {
+        Row: {
+          created_at: string | null
+          id: string
+          knowledge_item_id: string
+          task_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          knowledge_item_id: string
+          task_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          knowledge_item_id?: string
+          task_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_knowledge_links_knowledge_item_id_fkey"
+            columns: ["knowledge_item_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "task_knowledge_links_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       task_steps: {
         Row: {
           created_at: string | null
