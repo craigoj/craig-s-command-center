@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { ContextLinker } from "@/components/ContextLinker";
+import { TaskWithRelations, TaskStep } from "@/types/database";
 
 interface TaskDrillDownProps {
   taskId: string | null;
@@ -19,8 +20,8 @@ interface TaskDrillDownProps {
 }
 
 export const TaskDrillDown = ({ taskId, isOpen, onClose, onTaskUpdated }: TaskDrillDownProps) => {
-  const [task, setTask] = useState<any>(null);
-  const [steps, setSteps] = useState<any[]>([]);
+  const [task, setTask] = useState<TaskWithRelations | null>(null);
+  const [steps, setSteps] = useState<TaskStep[]>([]);
   const [isGeneratingSteps, setIsGeneratingSteps] = useState(false);
   const { toast } = useToast();
 
@@ -46,7 +47,7 @@ export const TaskDrillDown = ({ taskId, isOpen, onClose, onTaskUpdated }: TaskDr
       .eq('id', taskId)
       .single();
 
-    setTask(data);
+    setTask(data as TaskWithRelations);
   };
 
   const loadSteps = async () => {

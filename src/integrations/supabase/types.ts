@@ -21,6 +21,7 @@ export type Database = {
           icon: string
           id: string
           name: string
+          user_id: string | null
         }
         Insert: {
           color: string
@@ -28,6 +29,7 @@ export type Database = {
           icon: string
           id?: string
           name: string
+          user_id?: string | null
         }
         Update: {
           color?: string
@@ -35,6 +37,7 @@ export type Database = {
           icon?: string
           id?: string
           name?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -44,18 +47,21 @@ export type Database = {
           id: string
           parsed_type: string | null
           raw_text: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string | null
           id?: string
           parsed_type?: string | null
           raw_text: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string | null
           id?: string
           parsed_type?: string | null
           raw_text?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -67,6 +73,7 @@ export type Database = {
           project_id: string | null
           type: string
           url: string | null
+          user_id: string | null
         }
         Insert: {
           content: string
@@ -75,6 +82,7 @@ export type Database = {
           project_id?: string | null
           type: string
           url?: string | null
+          user_id?: string | null
         }
         Update: {
           content?: string
@@ -83,6 +91,7 @@ export type Database = {
           project_id?: string | null
           type?: string
           url?: string | null
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -94,6 +103,30 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          full_name: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       projects: {
         Row: {
           created_at: string | null
@@ -102,6 +135,7 @@ export type Database = {
           name: string
           priority: number | null
           status: string | null
+          user_id: string | null
         }
         Insert: {
           created_at?: string | null
@@ -110,6 +144,7 @@ export type Database = {
           name: string
           priority?: number | null
           status?: string | null
+          user_id?: string | null
         }
         Update: {
           created_at?: string | null
@@ -118,6 +153,7 @@ export type Database = {
           name?: string
           priority?: number | null
           status?: string | null
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -212,6 +248,7 @@ export type Database = {
           priority: number | null
           progress: number | null
           project_id: string | null
+          user_id: string | null
         }
         Insert: {
           archived_at?: string | null
@@ -224,6 +261,7 @@ export type Database = {
           priority?: number | null
           progress?: number | null
           project_id?: string | null
+          user_id?: string | null
         }
         Update: {
           archived_at?: string | null
@@ -236,6 +274,7 @@ export type Database = {
           priority?: number | null
           progress?: number | null
           project_id?: string | null
+          user_id?: string | null
         }
         Relationships: [
           {

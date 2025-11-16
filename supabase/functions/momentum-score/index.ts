@@ -12,11 +12,27 @@ serve(async (req) => {
   }
 
   try {
-    console.log('Calculating momentum score');
+    // Verify authentication
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      throw new Error('Missing authorization header');
+    }
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabase = createClient(supabaseUrl, supabaseKey, {
+      global: {
+        headers: { Authorization: authHeader },
+      },
+    });
+
+    // Get authenticated user
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+      throw new Error('Unauthorized');
+    }
+
+    console.log('Calculating momentum score for user:', user.id);
 
     // Get last 7 days of data
     const sevenDaysAgo = new Date();
@@ -26,6 +42,7 @@ serve(async (req) => {
     const { data: completedTasks } = await supabase
       .from('tasks')
       .select('id')
+      .eq('user_id', user.id)
       .eq('progress', 100)
       .is('archived_at', null)
       .gte('created_at', sevenDaysAgo.toISOString());
@@ -33,14 +50,20 @@ serve(async (req) => {
     // Completed steps in last 7 days
     const { data: completedSteps } = await supabase
       .from('task_steps')
-      .select('id')
+      .select('id, task_id')
       .eq('is_complete', true)
       .gte('created_at', sevenDaysAgo.toISOString());
+    
+    // Filter steps to only include those from user's tasks
+    const userCompletedSteps = completedSteps?.filter(step => 
+      completedTasks?.some(task => task.id === step.task_id)
+    ) || [];
 
     // Open or stagnant tasks
     const { data: openTasks } = await supabase
       .from('tasks')
       .select('id, progress')
+      .eq('user_id', user.id)
       .lt('progress', 100)
       .is('archived_at', null);
 
@@ -48,7 +71,7 @@ serve(async (req) => {
 
     // Calculate momentum
     const completedTasksCount = completedTasks?.length || 0;
-    const completedStepsCount = completedSteps?.length || 0;
+    const completedStepsCount = userCompletedSteps.length;
     const openTasksCount = openTasks?.length || 1; // Avoid division by zero
     const stagnantCount = stagnantTasks.length;
 
