@@ -7,6 +7,7 @@ import { DailyBriefing } from "@/components/DailyBriefing";
 import { MomentumScore } from "@/components/MomentumScore";
 import { TaskAgingAlert } from "@/components/TaskAgingAlert";
 import { IntakeQueue } from "@/components/IntakeQueue";
+import { MorningRoutineCard } from "@/components/MorningRoutineCard";
 import { supabase } from "@/integrations/supabase/client";
 import { Command, LogOut } from "lucide-react";
 import { TaskWithRelations } from "@/types/database";
@@ -90,6 +91,11 @@ const Index = () => {
         {/* Brain Bar */}
         <section>
           <BrainBar onTaskCreated={loadTopTasks} />
+        </section>
+
+        {/* Morning Routine */}
+        <section>
+          <MorningRoutineCard />
         </section>
 
         {/* Daily Briefing */}
