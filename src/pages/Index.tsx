@@ -13,6 +13,7 @@ import { EveningWrapUp } from "@/components/EveningWrapUp";
 import { WeeklyResetCard } from "@/components/WeeklyResetCard";
 import { MidweekCheckinCard } from "@/components/MidweekCheckinCard";
 import { ConsistencyScore } from "@/components/ConsistencyScore";
+import { MorningSuggestions } from "@/components/MorningSuggestions";
 import { supabase } from "@/integrations/supabase/client";
 import { Command, LogOut, Moon } from "lucide-react";
 import { TaskWithRelations } from "@/types/database";
@@ -104,6 +105,11 @@ const Index = () => {
         <section className="grid md:grid-cols-2 gap-6">
           <MorningRoutineCard />
           <WeeklyResetCard />
+        </section>
+
+        {/* AI Morning Suggestions */}
+        <section>
+          <MorningSuggestions />
         </section>
 
         {/* Midweek Check-in & Consistency Score */}
