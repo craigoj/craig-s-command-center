@@ -36,11 +36,12 @@ export const DomainProgressRing = () => {
 
         if (projects && projects.length > 0) {
           const projectIds = projects.map(p => p.id);
-          
+
           const { data: tasks } = await supabase
             .from('tasks')
             .select('progress')
-            .in('project_id', projectIds);
+            .in('project_id', projectIds)
+            .is('archived_at', null);
 
           if (tasks && tasks.length > 0) {
             const avgProgress = tasks.reduce((sum, t) => sum + t.progress, 0) / tasks.length;

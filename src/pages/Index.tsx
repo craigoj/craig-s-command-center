@@ -29,6 +29,7 @@ const Index = () => {
           domain:domains(name, color, icon)
         )
       `)
+      .is('archived_at', null)
       .order('priority', { ascending: true })
       .order('created_at', { ascending: false })
       .limit(3);

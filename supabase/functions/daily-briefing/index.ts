@@ -33,6 +33,7 @@ serve(async (req) => {
         progress,
         project:projects!inner(name, domain:domains!inner(name, icon))
       `)
+      .is('archived_at', null)
       .order('priority', { ascending: true })
       .limit(3);
 
@@ -43,6 +44,7 @@ serve(async (req) => {
     const { data: recentTasks } = await supabase
       .from('tasks')
       .select('name, created_at')
+      .is('archived_at', null)
       .gte('created_at', yesterday.toISOString())
       .order('created_at', { ascending: false });
 
@@ -60,6 +62,7 @@ serve(async (req) => {
         created_at,
         task_steps(is_complete, created_at)
       `)
+      .is('archived_at', null)
       .lte('created_at', sevenDaysAgo.toISOString())
       .order('priority', { ascending: true });
 
@@ -87,7 +90,8 @@ serve(async (req) => {
         const { data: tasks } = await supabase
           .from('tasks')
           .select('progress')
-          .in('project_id', projectIds);
+          .in('project_id', projectIds)
+          .is('archived_at', null);
 
         const avgProgress = tasks && tasks.length > 0
           ? tasks.reduce((sum, t) => sum + t.progress, 0) / tasks.length

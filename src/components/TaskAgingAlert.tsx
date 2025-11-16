@@ -39,7 +39,7 @@ export const TaskAgingAlert = () => {
     try {
       await supabase
         .from('tasks')
-        .update({ progress: -1 }) // Use -1 to indicate archived
+        .update({ archived_at: new Date().toISOString() })
         .eq('id', taskId);
 
       setStagnantTasks(prev => prev.filter(t => t.id !== taskId));
