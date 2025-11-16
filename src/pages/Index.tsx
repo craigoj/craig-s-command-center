@@ -8,6 +8,7 @@ import { MomentumScore } from "@/components/MomentumScore";
 import { TaskAgingAlert } from "@/components/TaskAgingAlert";
 import { IntakeQueue } from "@/components/IntakeQueue";
 import { MorningRoutineCard } from "@/components/MorningRoutineCard";
+import { DailyActionsCard } from "@/components/DailyActionsCard";
 import { supabase } from "@/integrations/supabase/client";
 import { Command, LogOut } from "lucide-react";
 import { TaskWithRelations } from "@/types/database";
@@ -101,6 +102,11 @@ const Index = () => {
         {/* Daily Briefing */}
         <section>
           <DailyBriefing />
+        </section>
+
+        {/* Daily Actions */}
+        <section>
+          <DailyActionsCard />
         </section>
 
         {/* Momentum & Aging Alerts */}
