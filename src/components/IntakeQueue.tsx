@@ -95,10 +95,22 @@ export const IntakeQueue = () => {
     }
 
     try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Authentication required",
+          description: "Please log in to add items",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const { error } = await supabase
         .from('intake_items')
         .insert({
-          raw_text: trimmedText
+          raw_text: trimmedText,
+          user_id: user.id
         });
 
       if (error) throw error;

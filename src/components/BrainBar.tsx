@@ -21,6 +21,17 @@ export const BrainBar = ({ onTaskCreated }: BrainBarProps) => {
     setIsProcessing(true);
 
     try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Authentication required",
+          description: "Please log in to create tasks",
+          variant: "destructive",
+        });
+        return;
+      }
+
       // Call AI to classify input
       const { data: classification, error: aiError } = await supabase.functions.invoke('classify-input', {
         body: { input: input.trim() }
@@ -37,6 +48,7 @@ export const BrainBar = ({ onTaskCreated }: BrainBarProps) => {
           const { data: existingProject } = await supabase
             .from('projects')
             .select('id')
+            .eq('user_id', user.id)
             .ilike('name', classification.suggested_project)
             .single();
 
@@ -47,6 +59,7 @@ export const BrainBar = ({ onTaskCreated }: BrainBarProps) => {
             const { data: domain } = await supabase
               .from('domains')
               .select('id')
+              .eq('user_id', user.id)
               .ilike('name', classification.suggested_domain || 'SSC')
               .single();
 
@@ -56,7 +69,8 @@ export const BrainBar = ({ onTaskCreated }: BrainBarProps) => {
               .insert({
                 name: classification.suggested_project,
                 domain_id: domain?.id,
-                priority: classification.priority || 3
+                priority: classification.priority || 3,
+                user_id: user.id
               })
               .select()
               .single();
@@ -73,7 +87,8 @@ export const BrainBar = ({ onTaskCreated }: BrainBarProps) => {
             description: classification.description,
             project_id: projectId,
             priority: classification.priority || 3,
-            is_top_priority: classification.priority === 1
+            is_top_priority: classification.priority === 1,
+            user_id: user.id
           });
 
         if (taskError) throw taskError;

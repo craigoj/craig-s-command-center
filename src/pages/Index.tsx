@@ -8,10 +8,13 @@ import { MomentumScore } from "@/components/MomentumScore";
 import { TaskAgingAlert } from "@/components/TaskAgingAlert";
 import { IntakeQueue } from "@/components/IntakeQueue";
 import { supabase } from "@/integrations/supabase/client";
-import { Command } from "lucide-react";
+import { Command, LogOut } from "lucide-react";
+import { TaskWithRelations } from "@/types/database";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const Index = () => {
-  const [topTasks, setTopTasks] = useState<any[]>([]);
+  const [topTasks, setTopTasks] = useState<TaskWithRelations[]>([]);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [isDrillDownOpen, setIsDrillDownOpen] = useState(false);
 
@@ -34,12 +37,21 @@ const Index = () => {
       .order('created_at', { ascending: false })
       .limit(3);
 
-    setTopTasks(data || []);
+    setTopTasks((data || []) as TaskWithRelations[]);
   };
 
   const handleTaskClick = (taskId: string) => {
     setSelectedTaskId(taskId);
     setIsDrillDownOpen(true);
+  };
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast.error('Failed to sign out');
+    } else {
+      toast.success('Signed out successfully');
+    }
   };
 
   return (
@@ -50,13 +62,24 @@ const Index = () => {
         
         <header className="relative border-b border-border/50 backdrop-blur-sm">
           <div className="container mx-auto px-4 py-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-primary/10">
-                <Command className="h-6 w-6 text-primary" />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Command className="h-6 w-6 text-primary" />
+                </div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                  CTRL:Craig
+                </h1>
               </div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                CTRL:Craig
-              </h1>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLogout}
+                className="gap-2"
+              >
+                <LogOut className="h-4 w-4" />
+                Sign Out
+              </Button>
             </div>
           </div>
         </header>
