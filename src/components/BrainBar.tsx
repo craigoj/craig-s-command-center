@@ -123,23 +123,25 @@ export const BrainBar = ({ onTaskCreated }: BrainBarProps) => {
   return (
     <form onSubmit={handleSubmit} className="relative w-full max-w-4xl mx-auto">
       <div className="relative">
-        <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-primary" />
+        <Sparkles className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-primary" />
         <Input
+          type="text"
+          placeholder="What's on your mind?"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="What do you want clarity on?"
           disabled={isProcessing}
-          className="h-14 pl-12 pr-32 text-lg bg-card border-border focus:border-primary transition-all"
+          className="pl-10 md:pl-12 pr-20 md:pr-24 h-12 md:h-14 text-sm md:text-base bg-card border-2 border-primary/20 focus:border-primary transition-colors"
         />
         <Button
           type="submit"
           disabled={!input.trim() || isProcessing}
-          className="absolute right-2 top-1/2 -translate-y-1/2 h-10"
+          size="sm"
+          className="absolute right-1.5 md:right-2 top-1/2 -translate-y-1/2 min-h-9 md:min-h-10"
         >
           {isProcessing ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
-            "Process"
+            <span className="text-xs md:text-sm">Process</span>
           )}
         </Button>
       </div>
