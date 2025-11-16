@@ -65,3 +65,13 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .interactive-card {
+    @apply transition-all duration-200 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98];
+  }
+  
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+}

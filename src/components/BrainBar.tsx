@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Sparkles, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useHaptic } from "@/hooks/useHaptic";
 
 interface BrainBarProps {
   onTaskCreated?: () => void;
@@ -13,6 +14,7 @@ export const BrainBar = ({ onTaskCreated }: BrainBarProps) => {
   const [input, setInput] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
+  const haptic = useHaptic();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,6 +95,7 @@ export const BrainBar = ({ onTaskCreated }: BrainBarProps) => {
 
         if (taskError) throw taskError;
 
+        haptic.success();
         toast({
           title: "Task created",
           description: classification.task_name,
@@ -100,6 +103,7 @@ export const BrainBar = ({ onTaskCreated }: BrainBarProps) => {
 
         onTaskCreated?.();
       } else {
+        haptic.light();
         // Show AI response for questions
         toast({
           title: "AI Response",
@@ -110,6 +114,7 @@ export const BrainBar = ({ onTaskCreated }: BrainBarProps) => {
       setInput("");
     } catch (error) {
       console.error('Error processing input:', error);
+      haptic.error();
       toast({
         title: "Error",
         description: "Failed to process input",

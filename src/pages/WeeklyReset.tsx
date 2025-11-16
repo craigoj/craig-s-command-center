@@ -7,9 +7,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Progress } from "@/components/ui/progress";
+import { SkeletonForm } from "@/components/SkeletonForm";
 import { useToast } from "@/hooks/use-toast";
+import { useHaptic } from "@/hooks/useHaptic";
 import { supabase } from "@/integrations/supabase/client";
 
 const HARADA_PILLARS = [
@@ -25,6 +28,7 @@ const HARADA_PILLARS = [
 
 export default function WeeklyReset() {
   const { toast } = useToast();
+  const haptic = useHaptic();
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   
@@ -149,12 +153,14 @@ export default function WeeklyReset() {
         }
       }
 
+      haptic.success();
       toast({
         title: "Weekly Reset Saved",
         description: "Your weekly reset has been saved successfully!",
       });
     } catch (error) {
       console.error('Error saving weekly reset:', error);
+      haptic.error();
       toast({
         title: "Error",
         description: "Failed to save weekly reset",
@@ -181,8 +187,18 @@ export default function WeeklyReset() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="bg-background pb-24 md:pb-8">
+        <div className="relative">
+          <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-transparent h-64 pointer-events-none" />
+          <header className="relative border-b border-border/50 backdrop-blur-sm">
+            <div className="container mx-auto px-2 md:px-4 py-4 md:py-6">
+              <Skeleton className="h-8 w-48" />
+            </div>
+          </header>
+        </div>
+        <main className="container mx-auto px-2 md:px-4 py-6 md:py-12 max-w-4xl">
+          <SkeletonForm />
+        </main>
       </div>
     );
   }

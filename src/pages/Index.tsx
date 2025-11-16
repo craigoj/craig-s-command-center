@@ -16,12 +16,16 @@ import { ConsistencyScore } from "@/components/ConsistencyScore";
 import { MorningSuggestions } from "@/components/MorningSuggestions";
 import { TimeBasedGreeting } from "@/components/TimeBasedGreeting";
 import { EmptyState } from "@/components/EmptyState";
+import { PullToRefreshIndicator } from "@/components/PullToRefreshIndicator";
+import { SkeletonTaskCard } from "@/components/SkeletonCard";
 import { supabase } from "@/integrations/supabase/client";
-import { Command, LogOut, Moon, CheckCircle2, Target } from "lucide-react";
+import { Command, LogOut, Moon, Target } from "lucide-react";
 import { TaskWithRelations } from "@/types/database";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useTimeOfDay } from "@/hooks/useTimeOfDay";
+import { usePullToRefresh } from "@/hooks/usePullToRefresh";
+import { useHaptic } from "@/hooks/useHaptic";
 
 const Index = () => {
   const [topTasks, setTopTasks] = useState<TaskWithRelations[]>([]);
@@ -30,6 +34,18 @@ const Index = () => {
   const [eveningWrapUpOpen, setEveningWrapUpOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const timeOfDay = useTimeOfDay();
+  const haptic = useHaptic();
+
+  // Pull to refresh
+  const handleRefresh = async () => {
+    await loadTopTasks();
+    haptic.success();
+    toast.success("Refreshed!");
+  };
+
+  const { containerRef, pullDistance, isRefreshing, isTriggered } = usePullToRefresh({
+    onRefresh: handleRefresh,
+  });
 
   useEffect(() => {
     loadTopTasks();
@@ -59,21 +75,32 @@ const Index = () => {
   };
 
   const handleTaskClick = (taskId: string) => {
+    haptic.light();
     setSelectedTaskId(taskId);
     setIsDrillDownOpen(true);
   };
 
   const handleLogout = async () => {
+    haptic.medium();
     const { error } = await supabase.auth.signOut();
     if (error) {
+      haptic.error();
       toast.error('Failed to sign out');
     } else {
+      haptic.success();
       toast.success('Signed out successfully');
     }
   };
 
   return (
-    <div className="bg-background">
+    <div ref={containerRef} className="bg-background overflow-auto h-screen">
+      {/* Pull to Refresh Indicator */}
+      <PullToRefreshIndicator
+        pullDistance={pullDistance}
+        isRefreshing={isRefreshing}
+        isTriggered={isTriggered}
+      />
+
       {/* Header with gradient glow */}
       <div className="relative">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-transparent h-64 pointer-events-none" />
@@ -96,6 +123,7 @@ const Index = () => {
                 variant="ghost"
                 size="sm"
                 onClick={handleLogout}
+                onTouchStart={() => haptic.selection()}
                 className="gap-2 self-end md:self-auto"
               >
                 <LogOut className="h-4 w-4" />
@@ -144,7 +172,11 @@ const Index = () => {
         {(timeOfDay === 'evening' || timeOfDay === 'night') && (
           <section className="flex justify-center animate-fade-in" style={{ animationDelay: '0.4s' }}>
             <Button 
-              onClick={() => setEveningWrapUpOpen(true)}
+              onClick={() => {
+                haptic.medium();
+                setEveningWrapUpOpen(true);
+              }}
+              onTouchStart={() => haptic.selection()}
               size="lg"
               className="gap-2 min-h-12 px-6 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
             >
@@ -178,9 +210,9 @@ const Index = () => {
           </div>
           
           {isLoading ? (
-            <div className="space-y-4">
+            <div className="space-y-3 md:space-y-4">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-24 bg-muted/50 rounded-lg animate-pulse" />
+                <SkeletonTaskCard key={i} />
               ))}
             </div>
           ) : topTasks.length > 0 ? (
@@ -190,6 +222,7 @@ const Index = () => {
                   key={task.id}
                   className="animate-fade-in"
                   style={{ animationDelay: `${0.6 + index * 0.1}s` }}
+                  onTouchStart={() => haptic.selection()}
                 >
                   <TaskCard 
                     task={task}

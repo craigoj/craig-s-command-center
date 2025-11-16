@@ -30,7 +30,7 @@ export const TaskCard = ({ task, onClick }: TaskCardProps) => {
 
   return (
     <Card 
-      className="p-6 hover:border-primary cursor-pointer transition-all bg-card/50 backdrop-blur-sm"
+      className="p-4 md:p-6 hover:border-primary cursor-pointer transition-all bg-card/50 backdrop-blur-sm interactive-card touch-target"
       onClick={onClick}
       style={{
         borderLeftWidth: '4px',
@@ -41,30 +41,30 @@ export const TaskCard = ({ task, onClick }: TaskCardProps) => {
         <div className="flex-1 space-y-3">
           <div className="flex items-center gap-2">
             {task.progress === 100 ? (
-              <CheckCircle2 className="h-5 w-5 text-green-500" />
+              <CheckCircle2 className="h-4 w-4 md:h-5 md:w-5 text-green-500" />
             ) : (
-              <Circle className="h-5 w-5 text-muted-foreground" />
+              <Circle className="h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
             )}
-            <h3 className="font-semibold text-lg">{task.name}</h3>
+            <h3 className="font-semibold text-base md:text-lg">{task.name}</h3>
           </div>
 
           {task.description && (
-            <p className="text-sm text-muted-foreground line-clamp-2">
+            <p className="text-xs md:text-sm text-muted-foreground line-clamp-2">
               {task.description}
             </p>
           )}
 
-          <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex items-center gap-2 flex-wrap">
             {task.project?.domain && (
-              <Badge variant="secondary" className="gap-1">
+              <Badge variant="secondary" className="gap-1 text-xs">
                 <span>{task.project.domain.icon}</span>
                 {task.project.domain.name}
               </Badge>
             )}
             {task.project?.name && (
-              <Badge variant="outline">{task.project.name}</Badge>
+              <Badge variant="outline" className="text-xs">{task.project.name}</Badge>
             )}
-            <Badge variant={task.priority === 1 ? "destructive" : "secondary"}>
+            <Badge variant={task.priority === 1 ? "destructive" : "secondary"} className="text-xs">
               {priorityLabel}
             </Badge>
             {task.due_date && (
