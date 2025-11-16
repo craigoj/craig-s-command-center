@@ -95,27 +95,28 @@ const Index = () => {
       </div>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-12 space-y-12">
-        {/* Brain Bar */}
-        <section>
+      <main className="container mx-auto px-2 md:px-4 py-6 md:py-12 space-y-6 md:space-y-12 pb-24 md:pb-12">
+        {/* Brain Bar - Sticky on mobile */}
+        <section className="sticky top-14 z-30 bg-background/95 backdrop-blur-sm py-4 md:relative md:top-0 md:bg-transparent md:backdrop-blur-none md:py-0">
           <BrainBar onTaskCreated={loadTopTasks} />
         </section>
 
         {/* Morning Routine & Weekly Reset */}
-        <section className="grid md:grid-cols-2 gap-6">
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           <MorningRoutineCard />
           <WeeklyResetCard />
         </section>
 
         {/* AI Morning Suggestions */}
-        <section>
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           <MorningSuggestions />
+          <MidweekCheckinCard />
         </section>
 
-        {/* Midweek Check-in & Consistency Score */}
-        <section className="grid md:grid-cols-2 gap-6">
-          <MidweekCheckinCard />
+        {/* Consistency & Daily Actions */}
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           <ConsistencyScore />
+          <DailyActionsCard />
         </section>
 
         {/* Daily Briefing */}
@@ -123,36 +124,21 @@ const Index = () => {
           <DailyBriefing />
         </section>
 
-        {/* Daily Actions */}
-        <section>
-          <DailyActionsCard />
-        </section>
-
         {/* Evening Wrap-Up */}
-        <section>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Moon className="h-5 w-5" />
-                Evening Reflection
-              </CardTitle>
-              <CardDescription>
-                Complete your day with reflection and lessons learned
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button 
-                onClick={() => setEveningWrapUpOpen(true)}
-                className="w-full"
-              >
-                Open Evening Wrap-Up
-              </Button>
-            </CardContent>
-          </Card>
+        <section className="flex justify-center">
+          <Button 
+            onClick={() => setEveningWrapUpOpen(true)}
+            size="lg"
+            variant="outline"
+            className="gap-2 border-primary/30 hover:bg-primary/10 min-h-12 px-6"
+          >
+            <Moon className="h-5 w-5" />
+            <span className="text-base">Evening Wrap-Up</span>
+          </Button>
         </section>
 
         {/* Momentum & Aging Alerts */}
-        <section className="grid md:grid-cols-2 gap-6">
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           <MomentumScore />
           <TaskAgingAlert />
         </section>
@@ -163,10 +149,10 @@ const Index = () => {
         </section>
 
         {/* Top 3 Tasks */}
-        <section className="space-y-6">
+        <section className="space-y-4 md:space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold">Today's Top 3</h2>
-            <span className="text-sm text-muted-foreground">Highest leverage tasks</span>
+            <h2 className="text-xl md:text-2xl font-bold">Today's Top 3</h2>
+            <span className="text-xs md:text-sm text-muted-foreground">Highest leverage tasks</span>
           </div>
           
           <div className="space-y-4">
