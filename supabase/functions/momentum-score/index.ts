@@ -12,24 +12,33 @@ serve(async (req) => {
   }
 
   try {
-    // Verify authentication
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      throw new Error('Missing authorization header');
-    }
-
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseKey, {
-      global: {
-        headers: { Authorization: authHeader },
-      },
-    });
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      {
+        global: {
+          headers: { Authorization: req.headers.get('Authorization')! },
+        },
+      }
+    );
 
     // Get authenticated user
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-    if (userError || !user) {
-      throw new Error('Unauthorized');
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+    
+    if (userError) {
+      console.error('Auth error:', userError);
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized', details: userError.message }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    if (!user) {
+      console.error('No user found in token');
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized', details: 'No user found' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     console.log('Calculating momentum score for user:', user.id);
@@ -39,7 +48,7 @@ serve(async (req) => {
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
     // Completed tasks in last 7 days
-    const { data: completedTasks } = await supabase
+    const { data: completedTasks } = await supabaseClient
       .from('tasks')
       .select('id')
       .eq('user_id', user.id)
@@ -48,7 +57,7 @@ serve(async (req) => {
       .gte('created_at', sevenDaysAgo.toISOString());
 
     // Completed steps in last 7 days
-    const { data: completedSteps } = await supabase
+    const { data: completedSteps } = await supabaseClient
       .from('task_steps')
       .select('id, task_id')
       .eq('is_complete', true)
@@ -60,7 +69,7 @@ serve(async (req) => {
     ) || [];
 
     // Open or stagnant tasks
-    const { data: openTasks } = await supabase
+    const { data: openTasks } = await supabaseClient
       .from('tasks')
       .select('id, progress')
       .eq('user_id', user.id)
