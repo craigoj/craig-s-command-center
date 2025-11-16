@@ -202,6 +202,7 @@ export type Database = {
       }
       tasks: {
         Row: {
+          archived_at: string | null
           created_at: string | null
           description: string | null
           due_date: string | null
@@ -213,6 +214,7 @@ export type Database = {
           project_id: string | null
         }
         Insert: {
+          archived_at?: string | null
           created_at?: string | null
           description?: string | null
           due_date?: string | null
@@ -224,6 +226,7 @@ export type Database = {
           project_id?: string | null
         }
         Update: {
+          archived_at?: string | null
           created_at?: string | null
           description?: string | null
           due_date?: string | null

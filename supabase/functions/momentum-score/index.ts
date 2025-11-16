@@ -27,6 +27,7 @@ serve(async (req) => {
       .from('tasks')
       .select('id')
       .eq('progress', 100)
+      .is('archived_at', null)
       .gte('created_at', sevenDaysAgo.toISOString());
 
     // Completed steps in last 7 days
@@ -40,7 +41,8 @@ serve(async (req) => {
     const { data: openTasks } = await supabase
       .from('tasks')
       .select('id, progress')
-      .lt('progress', 100);
+      .lt('progress', 100)
+      .is('archived_at', null);
 
     const stagnantTasks = openTasks?.filter(t => t.progress === 0) || [];
 
