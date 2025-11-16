@@ -14,39 +14,48 @@ import { WeeklyResetCard } from "@/components/WeeklyResetCard";
 import { MidweekCheckinCard } from "@/components/MidweekCheckinCard";
 import { ConsistencyScore } from "@/components/ConsistencyScore";
 import { MorningSuggestions } from "@/components/MorningSuggestions";
+import { TimeBasedGreeting } from "@/components/TimeBasedGreeting";
+import { EmptyState } from "@/components/EmptyState";
 import { supabase } from "@/integrations/supabase/client";
-import { Command, LogOut, Moon } from "lucide-react";
+import { Command, LogOut, Moon, CheckCircle2, Target } from "lucide-react";
 import { TaskWithRelations } from "@/types/database";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+import { useTimeOfDay } from "@/hooks/useTimeOfDay";
 
 const Index = () => {
   const [topTasks, setTopTasks] = useState<TaskWithRelations[]>([]);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [isDrillDownOpen, setIsDrillDownOpen] = useState(false);
   const [eveningWrapUpOpen, setEveningWrapUpOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const timeOfDay = useTimeOfDay();
 
   useEffect(() => {
     loadTopTasks();
   }, []);
 
   const loadTopTasks = async () => {
-    const { data } = await supabase
-      .from('tasks')
-      .select(`
-        *,
-        project:projects(
-          name,
-          domain:domains(name, color, icon)
-        )
-      `)
-      .is('archived_at', null)
-      .order('priority', { ascending: true })
-      .order('created_at', { ascending: false })
-      .limit(3);
+    try {
+      setIsLoading(true);
+      const { data } = await supabase
+        .from('tasks')
+        .select(`
+          *,
+          project:projects(
+            name,
+            domain:domains(name, color, icon)
+          )
+        `)
+        .is('archived_at', null)
+        .order('priority', { ascending: true })
+        .order('created_at', { ascending: false })
+        .limit(3);
 
-    setTopTasks((data || []) as TaskWithRelations[]);
+      setTopTasks((data || []) as TaskWithRelations[]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleTaskClick = (taskId: string) => {
@@ -70,24 +79,27 @@ const Index = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-transparent h-64 pointer-events-none" />
         
         <header className="relative border-b border-border/50 backdrop-blur-sm">
-          <div className="container mx-auto px-4 py-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-primary/10">
-                  <Command className="h-6 w-6 text-primary" />
+          <div className="container mx-auto px-2 md:px-4 py-4 md:py-6">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div className="flex items-start md:items-center gap-3 md:gap-4 w-full md:w-auto">
+                <div className="p-2 rounded-lg bg-primary/10 shrink-0">
+                  <Command className="h-5 w-5 md:h-6 md:w-6 text-primary" />
                 </div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                  CTRL:Craig
-                </h1>
+                <div className="flex-1 min-w-0">
+                  <h1 className="text-xl md:text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent truncate">
+                    CTRL:Craig
+                  </h1>
+                  <TimeBasedGreeting />
+                </div>
               </div>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleLogout}
-                className="gap-2"
+                className="gap-2 self-end md:self-auto"
               >
                 <LogOut className="h-4 w-4" />
-                Sign Out
+                <span className="hidden md:inline">Sign Out</span>
               </Button>
             </div>
           </div>
@@ -101,81 +113,103 @@ const Index = () => {
           <BrainBar onTaskCreated={loadTopTasks} />
         </section>
 
-        {/* Morning Routine & Weekly Reset */}
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-          <MorningRoutineCard />
-          <WeeklyResetCard />
-        </section>
+        {/* Morning Focus - Show 5am-11am */}
+        {(timeOfDay === 'morning') && (
+          <section className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 animate-fade-in">
+            <MorningRoutineCard />
+            <MorningSuggestions />
+          </section>
+        )}
 
-        {/* AI Morning Suggestions */}
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-          <MorningSuggestions />
+        {/* Weekly Planning - Always visible but highlighted on weekends */}
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+          <WeeklyResetCard />
           <MidweekCheckinCard />
         </section>
 
+        {/* Daytime Focus - Show 11am-5pm */}
+        {(timeOfDay === 'daytime' || timeOfDay === 'morning') && (
+          <section className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            <DailyBriefing />
+          </section>
+        )}
+
         {/* Consistency & Daily Actions */}
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 animate-fade-in" style={{ animationDelay: '0.3s' }}>
           <ConsistencyScore />
           <DailyActionsCard />
         </section>
 
-        {/* Daily Briefing */}
-        <section>
-          <DailyBriefing />
-        </section>
+        {/* Evening Wrap-Up - Show 5pm-10pm */}
+        {(timeOfDay === 'evening' || timeOfDay === 'night') && (
+          <section className="flex justify-center animate-fade-in" style={{ animationDelay: '0.4s' }}>
+            <Button 
+              onClick={() => setEveningWrapUpOpen(true)}
+              size="lg"
+              className="gap-2 min-h-12 px-6 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+            >
+              <Moon className="h-5 w-5" />
+              <span className="text-base">Complete Evening Wrap-Up</span>
+            </Button>
+          </section>
+        )}
 
-        {/* Evening Wrap-Up */}
-        <section className="flex justify-center">
-          <Button 
-            onClick={() => setEveningWrapUpOpen(true)}
-            size="lg"
-            variant="outline"
-            className="gap-2 border-primary/30 hover:bg-primary/10 min-h-12 px-6"
-          >
-            <Moon className="h-5 w-5" />
-            <span className="text-base">Evening Wrap-Up</span>
-          </Button>
-        </section>
-
-        {/* Momentum & Aging Alerts */}
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+        {/* Momentum & Aging Alerts - Progressive disclosure: collapse if no alerts */}
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 animate-fade-in" style={{ animationDelay: '0.7s' }}>
           <MomentumScore />
           <TaskAgingAlert />
         </section>
 
         {/* Intake Queue */}
-        <section>
+        <section className="animate-fade-in" style={{ animationDelay: '0.8s' }}>
           <IntakeQueue />
         </section>
 
         {/* Top 3 Tasks */}
-        <section className="space-y-4 md:space-y-6">
+        <section className="space-y-4 md:space-y-6 animate-fade-in" style={{ animationDelay: '0.5s' }}>
           <div className="flex items-center justify-between">
-            <h2 className="text-xl md:text-2xl font-bold">Today's Top 3</h2>
+            <h2 className="text-xl md:text-2xl font-bold">
+              {timeOfDay === 'morning' && "Today's Top 3"}
+              {timeOfDay === 'daytime' && "Active Tasks"}
+              {timeOfDay === 'evening' && "Finish Strong"}
+              {timeOfDay === 'night' && "Tomorrow's Preview"}
+            </h2>
             <span className="text-xs md:text-sm text-muted-foreground">Highest leverage tasks</span>
           </div>
           
-          <div className="space-y-4">
-            {topTasks.length > 0 ? (
-              topTasks.map((task) => (
-                <TaskCard
+          {isLoading ? (
+            <div className="space-y-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-24 bg-muted/50 rounded-lg animate-pulse" />
+              ))}
+            </div>
+          ) : topTasks.length > 0 ? (
+            <div className="grid gap-3 md:gap-4">
+              {topTasks.map((task, index) => (
+                <div
                   key={task.id}
-                  task={task}
-                  onClick={() => handleTaskClick(task.id)}
-                />
-              ))
-            ) : (
-              <div className="text-center py-12 text-muted-foreground">
-                <p className="text-lg mb-2">No tasks yet</p>
-                <p className="text-sm">Use the Brain Bar above to add your first task</p>
-              </div>
-            )}
-          </div>
+                  className="animate-fade-in"
+                  style={{ animationDelay: `${0.6 + index * 0.1}s` }}
+                >
+                  <TaskCard 
+                    task={task}
+                    onClick={() => handleTaskClick(task.id)}
+                  />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <EmptyState
+              icon={Target}
+              title="No tasks yet"
+              description="Use the Brain Bar above to capture your first task or thought. AI will help organize it for you."
+              className="animate-fade-in"
+            />
+          )}
         </section>
 
         {/* Domain Progress */}
-        <section className="space-y-6">
-          <h2 className="text-2xl font-bold">Domain Progress</h2>
+        <section className="animate-fade-in" style={{ animationDelay: '0.9s' }}>
           <DomainProgressRing />
         </section>
       </main>
