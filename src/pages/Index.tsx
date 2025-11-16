@@ -10,6 +10,7 @@ import { IntakeQueue } from "@/components/IntakeQueue";
 import { MorningRoutineCard } from "@/components/MorningRoutineCard";
 import { DailyActionsCard } from "@/components/DailyActionsCard";
 import { EveningWrapUp } from "@/components/EveningWrapUp";
+import { WeeklyResetCard } from "@/components/WeeklyResetCard";
 import { supabase } from "@/integrations/supabase/client";
 import { Command, LogOut, Moon } from "lucide-react";
 import { TaskWithRelations } from "@/types/database";
@@ -97,9 +98,10 @@ const Index = () => {
           <BrainBar onTaskCreated={loadTopTasks} />
         </section>
 
-        {/* Morning Routine */}
-        <section>
+        {/* Morning Routine & Weekly Reset */}
+        <section className="grid md:grid-cols-2 gap-6">
           <MorningRoutineCard />
+          <WeeklyResetCard />
         </section>
 
         {/* Daily Briefing */}

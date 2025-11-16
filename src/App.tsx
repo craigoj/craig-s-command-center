@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import Morning from "./pages/Morning";
+import WeeklyReset from "./pages/WeeklyReset";
 import { AuthGuard } from "./components/AuthGuard";
 
 const queryClient = new QueryClient();
@@ -21,6 +22,7 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/" element={<AuthGuard><Index /></AuthGuard>} />
           <Route path="/morning" element={<AuthGuard><Morning /></AuthGuard>} />
+          <Route path="/weekly-reset" element={<AuthGuard><WeeklyReset /></AuthGuard>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
