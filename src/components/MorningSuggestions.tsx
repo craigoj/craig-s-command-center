@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sparkles, TrendingUp, Target, Loader2, RefreshCw } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,12 +19,37 @@ interface MorningSuggestionsData {
 export function MorningSuggestions() {
   const [suggestions, setSuggestions] = useState<MorningSuggestionsData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Check authentication status
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsAuthenticated(!!session);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const loadSuggestions = async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('morning-suggestions');
+      // Get the current session to ensure we have a valid token
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        throw new Error("You must be logged in to view suggestions");
+      }
+
+      const { data, error } = await supabase.functions.invoke('morning-suggestions', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
 
       if (error) throw error;
 
@@ -33,7 +58,7 @@ export function MorningSuggestions() {
       console.error('Error loading suggestions:', error);
       toast({
         title: "Error",
-        description: "Failed to load morning suggestions. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to load morning suggestions. Please try again.",
         variant: "destructive",
       });
     } finally {
