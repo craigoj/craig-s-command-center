@@ -23,3 +23,6 @@ verify_jwt = true
 
 [functions.generate-lesson-draft]
 verify_jwt = true
+
+[functions.morning-suggestions]
+verify_jwt = true
