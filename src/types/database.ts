@@ -9,6 +9,11 @@ export type KnowledgeItem = Tables<'knowledge_items'>;
 export type IntakeItem = Tables<'intake_items'>;
 export type TaskKnowledgeLink = Tables<'task_knowledge_links'>;
 export type Profile = Tables<'profiles'>;
+export type ConsistencyLog = Tables<'consistency_logs'>;
+export type DailyAction = Tables<'daily_actions'>;
+export type WeeklyReset = Tables<'weekly_resets'>;
+export type HaradaPillar = Tables<'harada_pillars'>;
+export type MidweekCheckin = Tables<'midweek_checkins'>;
 
 // Extended types with relations
 export interface TaskWithRelations extends Task {

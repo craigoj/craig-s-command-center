@@ -14,6 +14,117 @@ export type Database = {
   }
   public: {
     Tables: {
+      consistency_logs: {
+        Row: {
+          created_at: string | null
+          emotion_label: string | null
+          id: string
+          identity_proof_moment: string | null
+          identity_statement: string | null
+          lesson_learned: string | null
+          log_date: string
+          mood_evening: string | null
+          morning_reflection: string | null
+          non_negotiable_1: string | null
+          non_negotiable_2: string | null
+          non_negotiable_3: string | null
+          non_negotiable_completed: boolean[] | null
+          phone_free_30min: boolean | null
+          tomorrow_adjustment: string | null
+          updated_at: string | null
+          user_id: string
+          visualization_done: boolean | null
+        }
+        Insert: {
+          created_at?: string | null
+          emotion_label?: string | null
+          id?: string
+          identity_proof_moment?: string | null
+          identity_statement?: string | null
+          lesson_learned?: string | null
+          log_date: string
+          mood_evening?: string | null
+          morning_reflection?: string | null
+          non_negotiable_1?: string | null
+          non_negotiable_2?: string | null
+          non_negotiable_3?: string | null
+          non_negotiable_completed?: boolean[] | null
+          phone_free_30min?: boolean | null
+          tomorrow_adjustment?: string | null
+          updated_at?: string | null
+          user_id: string
+          visualization_done?: boolean | null
+        }
+        Update: {
+          created_at?: string | null
+          emotion_label?: string | null
+          id?: string
+          identity_proof_moment?: string | null
+          identity_statement?: string | null
+          lesson_learned?: string | null
+          log_date?: string
+          mood_evening?: string | null
+          morning_reflection?: string | null
+          non_negotiable_1?: string | null
+          non_negotiable_2?: string | null
+          non_negotiable_3?: string | null
+          non_negotiable_completed?: boolean[] | null
+          phone_free_30min?: boolean | null
+          tomorrow_adjustment?: string | null
+          updated_at?: string | null
+          user_id?: string
+          visualization_done?: boolean | null
+        }
+        Relationships: []
+      }
+      daily_actions: {
+        Row: {
+          confident_posture: boolean | null
+          created_at: string | null
+          declutter_item: boolean | null
+          id: string
+          kept_promise: boolean | null
+          log_date: string
+          movement_30min: boolean | null
+          reframed_thought: boolean | null
+          thoughtful_text: boolean | null
+          uncomfortable_action: boolean | null
+          updated_at: string | null
+          user_id: string
+          water_64oz: boolean | null
+        }
+        Insert: {
+          confident_posture?: boolean | null
+          created_at?: string | null
+          declutter_item?: boolean | null
+          id?: string
+          kept_promise?: boolean | null
+          log_date: string
+          movement_30min?: boolean | null
+          reframed_thought?: boolean | null
+          thoughtful_text?: boolean | null
+          uncomfortable_action?: boolean | null
+          updated_at?: string | null
+          user_id: string
+          water_64oz?: boolean | null
+        }
+        Update: {
+          confident_posture?: boolean | null
+          created_at?: string | null
+          declutter_item?: boolean | null
+          id?: string
+          kept_promise?: boolean | null
+          log_date?: string
+          movement_30min?: boolean | null
+          reframed_thought?: boolean | null
+          thoughtful_text?: boolean | null
+          uncomfortable_action?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+          water_64oz?: boolean | null
+        }
+        Relationships: []
+      }
       domains: {
         Row: {
           color: string
@@ -38,6 +149,39 @@ export type Database = {
           id?: string
           name?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      harada_pillars: {
+        Row: {
+          created_at: string | null
+          health_score: number | null
+          id: string
+          notes: string | null
+          pillar_name: string
+          updated_at: string | null
+          user_id: string
+          week_start_date: string
+        }
+        Insert: {
+          created_at?: string | null
+          health_score?: number | null
+          id?: string
+          notes?: string | null
+          pillar_name: string
+          updated_at?: string | null
+          user_id: string
+          week_start_date: string
+        }
+        Update: {
+          created_at?: string | null
+          health_score?: number | null
+          id?: string
+          notes?: string | null
+          pillar_name?: string
+          updated_at?: string | null
+          user_id?: string
+          week_start_date?: string
         }
         Relationships: []
       }
@@ -102,6 +246,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      midweek_checkins: {
+        Row: {
+          checkin_date: string
+          correction_plan: string | null
+          created_at: string | null
+          id: string
+          pillar_attention: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          checkin_date: string
+          correction_plan?: string | null
+          created_at?: string | null
+          id?: string
+          pillar_attention?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          checkin_date?: string
+          correction_plan?: string | null
+          created_at?: string | null
+          id?: string
+          pillar_attention?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -285,6 +459,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      weekly_resets: {
+        Row: {
+          created_at: string | null
+          environment_reset_done: boolean | null
+          id: string
+          miss_reasons: string | null
+          misses: string[] | null
+          pillar_needs_attention: string | null
+          updated_at: string | null
+          user_id: string
+          week_priorities: string[] | null
+          week_start_date: string
+          wins: string[] | null
+        }
+        Insert: {
+          created_at?: string | null
+          environment_reset_done?: boolean | null
+          id?: string
+          miss_reasons?: string | null
+          misses?: string[] | null
+          pillar_needs_attention?: string | null
+          updated_at?: string | null
+          user_id: string
+          week_priorities?: string[] | null
+          week_start_date: string
+          wins?: string[] | null
+        }
+        Update: {
+          created_at?: string | null
+          environment_reset_done?: boolean | null
+          id?: string
+          miss_reasons?: string | null
+          misses?: string[] | null
+          pillar_needs_attention?: string | null
+          updated_at?: string | null
+          user_id?: string
+          week_priorities?: string[] | null
+          week_start_date?: string
+          wins?: string[] | null
+        }
+        Relationships: []
       }
     }
     Views: {
