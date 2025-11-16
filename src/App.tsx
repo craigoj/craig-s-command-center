@@ -10,6 +10,7 @@ import Morning from "./pages/Morning";
 import WeeklyReset from "./pages/WeeklyReset";
 import MidweekCheckin from "./pages/MidweekCheckin";
 import { AuthGuard } from "./components/AuthGuard";
+import { AppLayout } from "./components/AppLayout";
 
 const queryClient = new QueryClient();
 
@@ -21,10 +22,10 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/auth" element={<Auth />} />
-          <Route path="/" element={<AuthGuard><Index /></AuthGuard>} />
-          <Route path="/morning" element={<AuthGuard><Morning /></AuthGuard>} />
-          <Route path="/weekly-reset" element={<AuthGuard><WeeklyReset /></AuthGuard>} />
-          <Route path="/midweek-checkin" element={<AuthGuard><MidweekCheckin /></AuthGuard>} />
+          <Route path="/" element={<AuthGuard><AppLayout><Index /></AppLayout></AuthGuard>} />
+          <Route path="/morning" element={<AuthGuard><AppLayout><Morning /></AppLayout></AuthGuard>} />
+          <Route path="/weekly-reset" element={<AuthGuard><AppLayout><WeeklyReset /></AppLayout></AuthGuard>} />
+          <Route path="/midweek-checkin" element={<AuthGuard><AppLayout><MidweekCheckin /></AppLayout></AuthGuard>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

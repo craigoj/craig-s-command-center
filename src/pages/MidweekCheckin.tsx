@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { format, startOfWeek } from "date-fns";
-import { Command, ArrowLeft, Save, Loader2, AlertTriangle, Target } from "lucide-react";
+import { Command, Save, Loader2, AlertTriangle, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -22,7 +21,6 @@ const HARADA_PILLARS = [
 ];
 
 export default function MidweekCheckin() {
-  const navigate = useNavigate();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -122,8 +120,6 @@ export default function MidweekCheckin() {
         title: "Check-in Saved",
         description: "Your midweek check-in has been saved successfully!",
       });
-
-      navigate('/');
     } catch (error) {
       console.error('Error saving check-in:', error);
       toast({
@@ -145,7 +141,7 @@ export default function MidweekCheckin() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background">
       {/* Header */}
       <div className="relative">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-transparent h-64 pointer-events-none" />
@@ -154,23 +150,14 @@ export default function MidweekCheckin() {
           <div className="container mx-auto px-4 py-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => navigate('/')}
-                >
-                  <ArrowLeft className="h-5 w-5" />
-                </Button>
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-primary/10">
-                    <Command className="h-6 w-6 text-primary" />
-                  </div>
-                  <div>
-                    <h1 className="text-2xl font-bold">Midweek Check-in</h1>
-                    <p className="text-sm text-muted-foreground">
-                      {format(new Date(), 'EEEE, MMM d, yyyy')}
-                    </p>
-                  </div>
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Command className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold">Midweek Check-in</h1>
+                  <p className="text-sm text-muted-foreground">
+                    {format(new Date(), 'EEEE, MMM d, yyyy')}
+                  </p>
                 </div>
               </div>
               <Button onClick={handleSave} disabled={isSaving}>
