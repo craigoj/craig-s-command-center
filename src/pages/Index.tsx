@@ -9,16 +9,19 @@ import { TaskAgingAlert } from "@/components/TaskAgingAlert";
 import { IntakeQueue } from "@/components/IntakeQueue";
 import { MorningRoutineCard } from "@/components/MorningRoutineCard";
 import { DailyActionsCard } from "@/components/DailyActionsCard";
+import { EveningWrapUp } from "@/components/EveningWrapUp";
 import { supabase } from "@/integrations/supabase/client";
-import { Command, LogOut } from "lucide-react";
+import { Command, LogOut, Moon } from "lucide-react";
 import { TaskWithRelations } from "@/types/database";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 
 const Index = () => {
   const [topTasks, setTopTasks] = useState<TaskWithRelations[]>([]);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [isDrillDownOpen, setIsDrillDownOpen] = useState(false);
+  const [eveningWrapUpOpen, setEveningWrapUpOpen] = useState(false);
 
   useEffect(() => {
     loadTopTasks();
@@ -109,6 +112,29 @@ const Index = () => {
           <DailyActionsCard />
         </section>
 
+        {/* Evening Wrap-Up */}
+        <section>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Moon className="h-5 w-5" />
+                Evening Reflection
+              </CardTitle>
+              <CardDescription>
+                Complete your day with reflection and lessons learned
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button 
+                onClick={() => setEveningWrapUpOpen(true)}
+                className="w-full"
+              >
+                Open Evening Wrap-Up
+              </Button>
+            </CardContent>
+          </Card>
+        </section>
+
         {/* Momentum & Aging Alerts */}
         <section className="grid md:grid-cols-2 gap-6">
           <MomentumScore />
@@ -159,6 +185,9 @@ const Index = () => {
         onClose={() => setIsDrillDownOpen(false)}
         onTaskUpdated={loadTopTasks}
       />
+
+      {/* Evening Wrap-Up Modal */}
+      <EveningWrapUp open={eveningWrapUpOpen} onOpenChange={setEveningWrapUpOpen} />
     </div>
   );
 };
