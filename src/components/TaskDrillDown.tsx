@@ -51,7 +51,7 @@ export const TaskDrillDown = ({ taskId, isOpen, onClose, onTaskUpdated }: TaskDr
   };
 
   const loadSteps = async () => {
-    if (!taskId) return;
+    if (!taskId) return [];
 
     const { data } = await supabase
       .from('task_steps')
@@ -59,7 +59,9 @@ export const TaskDrillDown = ({ taskId, isOpen, onClose, onTaskUpdated }: TaskDr
       .eq('task_id', taskId)
       .order('order_index');
 
-    setSteps(data || []);
+    const newSteps = data || [];
+    setSteps(newSteps);
+    return newSteps;
   };
 
   const generateSteps = async () => {
@@ -121,15 +123,17 @@ export const TaskDrillDown = ({ taskId, isOpen, onClose, onTaskUpdated }: TaskDr
       .update({ is_complete: isComplete })
       .eq('id', stepId);
 
-    await loadSteps();
-    await updateTaskProgress();
+    const updatedSteps = await loadSteps();
+    await updateTaskProgress(updatedSteps);
   };
 
-  const updateTaskProgress = async () => {
-    if (!taskId || steps.length === 0) return;
+  const updateTaskProgress = async (currentSteps?: any[]) => {
+    if (!taskId) return;
 
-    const completedSteps = steps.filter(s => s.is_complete).length;
-    const progress = Math.round((completedSteps / steps.length) * 100);
+    const stepsToUse = currentSteps ?? await loadSteps();
+    const totalSteps = stepsToUse.length;
+    const completedSteps = stepsToUse.filter(s => s.is_complete).length;
+    const progress = totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0;
 
     await supabase
       .from('tasks')
