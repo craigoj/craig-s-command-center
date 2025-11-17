@@ -23,12 +23,14 @@ export const TaskAgingAlert = () => {
 
   const loadStagnantTasks = async () => {
     try {
-      const { data, error } = await supabase.functions.invoke('daily-briefing');
+      const { data, error } = await supabase.functions.invoke<{ stagnantTasks: StagnantTask[] }>('stagnant-tasks');
 
       if (error) throw error;
 
-      if (data.stagnantTasks && data.stagnantTasks.length > 0) {
+      if (data?.stagnantTasks && data.stagnantTasks.length > 0) {
         setStagnantTasks(data.stagnantTasks);
+      } else {
+        setStagnantTasks([]);
       }
     } catch (error) {
       console.error('Error loading stagnant tasks:', error);
