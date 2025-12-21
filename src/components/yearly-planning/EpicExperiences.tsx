@@ -55,11 +55,11 @@ interface EpicExperiencesProps {
   yearlyPlanId: string;
 }
 
-const categoryConfig: Record<string, { label: string; icon: React.ComponentType<{ className?: string }>; color: string; bgColor: string }> = {
-  adventure: { label: "Adventure", icon: Mountain, color: "text-emerald-600", bgColor: "bg-emerald-500/10" },
-  learning: { label: "Learning", icon: BookOpen, color: "text-blue-600", bgColor: "bg-blue-500/10" },
-  relationship: { label: "Relationship", icon: Heart, color: "text-pink-600", bgColor: "bg-pink-500/10" },
-  challenge: { label: "Challenge", icon: Target, color: "text-orange-600", bgColor: "bg-orange-500/10" },
+const categoryConfig: Record<string, { label: string; icon: React.ComponentType<{ className?: string }>; color: string; bgColor: string; lifeResumeCategory: string }> = {
+  adventure: { label: "Adventure", icon: Mountain, color: "text-emerald-600", bgColor: "bg-emerald-500/10", lifeResumeCategory: "physical" },
+  learning: { label: "Learning", icon: BookOpen, color: "text-blue-600", bgColor: "bg-blue-500/10", lifeResumeCategory: "mental_emotional" },
+  relationship: { label: "Relationship", icon: Heart, color: "text-pink-600", bgColor: "bg-pink-500/10", lifeResumeCategory: "mental_emotional" },
+  challenge: { label: "Challenge", icon: Target, color: "text-orange-600", bgColor: "bg-orange-500/10", lifeResumeCategory: "creative_impact" },
 };
 
 const categoryExamples: Record<string, string[]> = {
@@ -182,6 +182,54 @@ export default function EpicExperiences({ yearlyPlanId }: EpicExperiencesProps) 
     }
   };
 
+  const addToLifeResume = async (experience: EpicExperience) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const config = categoryConfig[experience.category];
+      const lifeResumeCategory = config?.lifeResumeCategory || 'physical';
+      const itemText = `Completed: ${experience.title}`;
+
+      // Check if life_resume entry exists for this category
+      const { data: existing } = await supabase
+        .from('life_resume')
+        .select('id, items')
+        .eq('user_id', user.id)
+        .eq('yearly_plan_id', yearlyPlanId)
+        .eq('category', lifeResumeCategory)
+        .maybeSingle();
+
+      if (existing) {
+        // Add to existing items if not already there
+        const currentItems = Array.isArray(existing.items) ? existing.items as string[] : [];
+        if (!currentItems.includes(itemText)) {
+          await supabase
+            .from('life_resume')
+            .update({ items: [...currentItems, itemText] })
+            .eq('id', existing.id);
+        }
+      } else {
+        // Create new life_resume entry
+        await supabase
+          .from('life_resume')
+          .insert({
+            user_id: user.id,
+            yearly_plan_id: yearlyPlanId,
+            category: lifeResumeCategory,
+            items: [itemText],
+          });
+      }
+
+      toast.success('Added to Life Resume!', {
+        description: `"${experience.title}" added to your ${config?.label || 'Life'} Resume`,
+      });
+    } catch (error) {
+      console.error('Error adding to life resume:', error);
+      // Don't show error - this is a bonus feature
+    }
+  };
+
   const handleToggleComplete = async (experience: EpicExperience) => {
     const newCompleted = !experience.completed;
     
@@ -205,6 +253,8 @@ export default function EpicExperiences({ yearlyPlanId }: EpicExperiencesProps) 
       if (newCompleted) {
         fireCelebration();
         toast.success('Experience completed! 🎉');
+        // Auto-add to life resume
+        await addToLifeResume(experience);
       } else {
         toast.success('Experience marked as incomplete');
       }
