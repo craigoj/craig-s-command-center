@@ -324,7 +324,10 @@ export default function YearlyPlanningDashboard() {
 
           {/* Tracking Tab */}
           <TabsContent value="tracking" className="animate-fade-in">
-            <TrackingTab />
+            <TrackingTab 
+              yearlyPlanId={data.yearlyPlan.id}
+              theme={themeData.title}
+            />
           </TabsContent>
         </Tabs>
       </div>
