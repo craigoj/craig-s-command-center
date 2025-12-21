@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Progress } from '@/components/ui/progress';
+import OverviewTab from '@/components/yearly-planning/OverviewTab';
 
 interface YearlyPlan {
   id: string;
@@ -238,130 +239,12 @@ export default function YearlyPlanningDashboard() {
           </TabsList>
 
           {/* Overview Tab */}
-          <TabsContent value="overview" className="space-y-6 animate-fade-in">
-            {/* Quick Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-              <Card>
-                <CardContent className="pt-4 pb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                      <Target className="w-5 h-5 text-primary" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-xs text-muted-foreground">Theme</p>
-                      <p className="font-medium text-sm truncate">{themeData.title}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="pt-4 pb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center flex-shrink-0">
-                      <Sparkles className="w-5 h-5 text-orange-500" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-xs text-muted-foreground">Misogi</p>
-                      <p className="font-medium text-sm">
-                        {data.misogi ? `${data.misogi.completion_percentage}%` : 'Not set'}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="pt-4 pb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center flex-shrink-0">
-                      <Trophy className="w-5 h-5 text-green-500" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-xs text-muted-foreground">Life Resume</p>
-                      <p className="font-medium text-sm">{totalLifeResumeItems} items</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardContent className="pt-4 pb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center flex-shrink-0">
-                      <Calendar className="w-5 h-5 text-blue-500" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-xs text-muted-foreground">Days Left</p>
-                      <p className="font-medium text-sm">
-                        {Math.ceil((new Date(currentYear, 11, 31).getTime() - Date.now()) / (1000 * 60 * 60 * 24))}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Misogi Progress */}
-            {data.misogi && (
-              <Card>
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center">
-                        <Sparkles className="w-5 h-5 text-orange-500" />
-                      </div>
-                      <div>
-                        <CardTitle className="text-lg">{data.misogi.title}</CardTitle>
-                        <CardDescription>{categoryLabels[data.misogi.category] || data.misogi.category}</CardDescription>
-                      </div>
-                    </div>
-                    <span className="text-2xl font-bold text-primary">{data.misogi.completion_percentage}%</span>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <Progress value={data.misogi.completion_percentage} className="h-3" />
-                  {data.misogi.daily_action_required && (
-                    <p className="text-xs text-muted-foreground mt-2">
-                      ⚡ Requires daily action
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Quick Actions */}
-            <div className="grid md:grid-cols-2 gap-4">
-              <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => handleTabChange('tracking')}>
-                <CardContent className="pt-6 pb-6">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center">
-                      <CheckCircle2 className="w-6 h-6 text-green-500" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">Daily Scorecard</h3>
-                      <p className="text-sm text-muted-foreground">Log today's wins and challenges</p>
-                    </div>
-                    <ArrowRight className="w-5 h-5 text-muted-foreground ml-auto" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => handleTabChange('tracking')}>
-                <CardContent className="pt-6 pb-6">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center">
-                      <TrendingUp className="w-6 h-6 text-blue-500" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">Weekly Reflection</h3>
-                      <p className="text-sm text-muted-foreground">Review your theme alignment</p>
-                    </div>
-                    <ArrowRight className="w-5 h-5 text-muted-foreground ml-auto" />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+          <TabsContent value="overview" className="animate-fade-in">
+            <OverviewTab 
+              yearlyPlan={data.yearlyPlan}
+              misogi={data.misogi}
+              onTabChange={handleTabChange}
+            />
           </TabsContent>
 
           {/* Identity Tab */}
