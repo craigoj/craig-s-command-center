@@ -38,6 +38,7 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import ConstraintsManager from './ConstraintsManager';
+import EpicExperiences from './EpicExperiences';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { format, differenceInDays, parseISO, isAfter } from 'date-fns';
@@ -371,11 +372,20 @@ export default function GoalsTab({ misogi: initialMisogi, yearlyPlanId, onMisogi
           </CardContent>
         </Card>
 
-        {/* Constraints Manager */}
+        {/* Epic Experiences */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.4 }}
+        >
+          <EpicExperiences yearlyPlanId={yearlyPlanId} />
+        </motion.div>
+
+        {/* Constraints Manager */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.4 }}
         >
           <ConstraintsManager yearlyPlanId={yearlyPlanId} />
         </motion.div>
@@ -627,6 +637,9 @@ export default function GoalsTab({ misogi: initialMisogi, yearlyPlanId, onMisogi
           </CardContent>
         </Card>
       )}
+
+      {/* Epic Experiences */}
+      <EpicExperiences yearlyPlanId={yearlyPlanId} />
 
       {/* Constraints Manager */}
       <ConstraintsManager yearlyPlanId={yearlyPlanId} />
