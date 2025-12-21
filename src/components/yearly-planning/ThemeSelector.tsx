@@ -67,6 +67,10 @@ const ThemeSelector = forwardRef<ThemeSelectorRef, ThemeSelectorProps>(
       setSelectedTheme(themeId);
       onThemeSelect(themeId);
 
+      // Get the theme title for the database (constraint expects display titles)
+      const theme = themes.find(t => t.id === themeId);
+      if (!theme) return;
+
       // Auto-save when theme is selected
       if (yearlyPlanId) {
         setSaving(true);
@@ -74,7 +78,7 @@ const ThemeSelector = forwardRef<ThemeSelectorRef, ThemeSelectorProps>(
           const { error } = await supabase
             .from("yearly_plans")
             .update({
-              theme: themeId,
+              theme: theme.title, // Use display title for database constraint
               theme_created_at: new Date().toISOString(),
             })
             .eq("id", yearlyPlanId);
@@ -93,12 +97,16 @@ const ThemeSelector = forwardRef<ThemeSelectorRef, ThemeSelectorProps>(
       saveTheme: async () => {
         if (!selectedTheme || !yearlyPlanId) return false;
         
+        // Get the theme title for the database
+        const theme = themes.find(t => t.id === selectedTheme);
+        if (!theme) return false;
+
         setSaving(true);
         try {
           const { error } = await supabase
             .from("yearly_plans")
             .update({
-              theme: selectedTheme,
+              theme: theme.title, // Use display title for database constraint
               theme_created_at: new Date().toISOString(),
             })
             .eq("id", yearlyPlanId);
@@ -116,7 +124,10 @@ const ThemeSelector = forwardRef<ThemeSelectorRef, ThemeSelectorProps>(
       getSelectedTheme: () => selectedTheme,
     }));
 
-    const currentYear = new Date().getFullYear();
+    // Use next year for planning if we're in November or December
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const planningYear = currentMonth >= 10 ? today.getFullYear() + 1 : today.getFullYear();
     const selectedThemeData = themes.find((t) => t.id === selectedTheme);
 
     return (
@@ -124,7 +135,7 @@ const ThemeSelector = forwardRef<ThemeSelectorRef, ThemeSelectorProps>(
         {/* Header */}
         <div className="text-center space-y-2">
           <h2 className="text-2xl md:text-3xl font-bold text-foreground">
-            Pick Your {currentYear} Theme
+            Pick Your {planningYear} Theme
           </h2>
           <p className="text-muted-foreground text-lg">
             One focus to filter every decision this year
