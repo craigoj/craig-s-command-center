@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight, Sparkles, Target, Trophy, Check, Loader2 } f
 import { cn } from '@/lib/utils';
 import { LifeResumeBuilder, LifeResumeBuilderRef } from '@/components/yearly-planning/LifeResumeBuilder';
 import ThemeSelector, { ThemeSelectorRef } from '@/components/yearly-planning/ThemeSelector';
+import MisogiCreator, { MisogiCreatorRef } from '@/components/yearly-planning/MisogiCreator';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 const steps = [
@@ -52,6 +53,7 @@ export default function YearlyPlanningOnboarding() {
   // Refs for step components
   const lifeResumeRef = useRef<LifeResumeBuilderRef>(null);
   const themeSelectorRef = useRef<ThemeSelectorRef>(null);
+  const misogiCreatorRef = useRef<MisogiCreatorRef>(null);
 
   // Load existing yearly plan data
   useEffect(() => {
@@ -88,7 +90,7 @@ export default function YearlyPlanningOnboarding() {
   const canProceed = useCallback(() => {
     if (currentStep === 1) return stepData.step1HasData;
     if (currentStep === 2) return stepData.step2HasData;
-    // Step 3 will have its own validation
+    if (currentStep === 3) return stepData.step3HasData;
     return true;
   }, [currentStep, stepData]);
 
@@ -125,6 +127,25 @@ export default function YearlyPlanningOnboarding() {
     if (currentStep === 2 && !stepData.step2HasData) {
       toast.error('Please select a theme to continue');
       return;
+    }
+
+    // Step 3: Submit Misogi form
+    if (currentStep === 3 && misogiCreatorRef.current) {
+      setIsSaving(true);
+      try {
+        const success = await misogiCreatorRef.current.submit();
+        if (!success) {
+          setIsSaving(false);
+          return;
+        }
+        // Navigate happens inside MisogiCreator onComplete
+        setIsSaving(false);
+        return;
+      } catch (error) {
+        toast.error('Failed to save Misogi. Please try again.');
+        setIsSaving(false);
+        return;
+      }
     }
 
     if (!completedSteps.includes(currentStep)) {
@@ -278,13 +299,14 @@ export default function YearlyPlanningOnboarding() {
                 />
               )}
 
+              {/* Step 3: Misogi Creator */}
               {currentStep === 3 && (
-                <div className="py-12 flex flex-col items-center justify-center text-center border-2 border-dashed border-muted rounded-lg bg-muted/30">
-                  <Sparkles className="w-12 h-12 text-muted-foreground/50 mb-3" />
-                  <p className="text-muted-foreground text-sm">
-                    Misogi Creator will be implemented here
-                  </p>
-                </div>
+                <MisogiCreator
+                  ref={misogiCreatorRef}
+                  yearlyPlanId={yearlyPlanId}
+                  onComplete={() => navigate('/yearly-planning')}
+                  onDataChange={(hasData) => setStepData(prev => ({ ...prev, step3HasData: hasData }))}
+                />
               )}
             </CardContent>
           </Card>
