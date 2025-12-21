@@ -6,10 +6,28 @@ import { supabase } from "@/integrations/supabase/client";
 export const MomentumScore = () => {
   const [momentum, setMomentum] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    loadMomentum();
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+    };
+    
+    checkAuth();
+    
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      setIsAuthenticated(!!session);
+    });
+    
+    return () => subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadMomentum();
+    }
+  }, [isAuthenticated]);
 
   const loadMomentum = async () => {
     try {
