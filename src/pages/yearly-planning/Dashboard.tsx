@@ -24,6 +24,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { Progress } from '@/components/ui/progress';
 import OverviewTab from '@/components/yearly-planning/OverviewTab';
+import GoalsTab from '@/components/yearly-planning/GoalsTab';
 
 interface YearlyPlan {
   id: string;
@@ -312,76 +313,12 @@ export default function YearlyPlanningDashboard() {
           </TabsContent>
 
           {/* Goals Tab */}
-          <TabsContent value="goals" className="space-y-6 animate-fade-in">
-            {/* Misogi */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-orange-500" />
-                  Misogi Challenge
-                </CardTitle>
-                <CardDescription>Your impossible goal for the year</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {data.misogi ? (
-                  <div className="space-y-4">
-                    <div>
-                      <h3 className="text-xl font-semibold mb-2">{data.misogi.title}</h3>
-                      {data.misogi.description && (
-                        <p className="text-muted-foreground text-sm">{data.misogi.description}</p>
-                      )}
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <span className="px-2 py-1 bg-muted rounded-full text-xs">
-                        {categoryLabels[data.misogi.category] || data.misogi.category}
-                      </span>
-                      {data.misogi.difficulty_level && (
-                        <span className="px-2 py-1 bg-orange-500/10 text-orange-600 rounded-full text-xs">
-                          Difficulty: {data.misogi.difficulty_level}/10
-                        </span>
-                      )}
-                      {data.misogi.daily_action_required && (
-                        <span className="px-2 py-1 bg-primary/10 text-primary rounded-full text-xs">
-                          Daily Action Required
-                        </span>
-                      )}
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-sm mb-2">
-                        <span className="text-muted-foreground">Progress</span>
-                        <span className="font-medium">{data.misogi.completion_percentage}%</span>
-                      </div>
-                      <Progress value={data.misogi.completion_percentage} className="h-3" />
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Sparkles className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                    <p>No Misogi challenge set</p>
-                    <Button variant="outline" size="sm" className="mt-3" onClick={() => navigate('/yearly-planning/onboarding')}>
-                      Create Misogi
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Constraints placeholder */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Goal className="w-5 h-5" />
-                  Constraints
-                </CardTitle>
-                <CardDescription>Rules that keep you focused</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded-lg">
-                  <Goal className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                  <p className="text-sm">Constraints feature coming soon</p>
-                </div>
-              </CardContent>
-            </Card>
+          <TabsContent value="goals" className="animate-fade-in">
+            <GoalsTab 
+              misogi={data.misogi}
+              yearlyPlanId={data.yearlyPlan.id}
+              onMisogiUpdate={(updatedMisogi) => setData(prev => ({ ...prev, misogi: updatedMisogi }))}
+            />
           </TabsContent>
 
           {/* Tracking Tab */}
