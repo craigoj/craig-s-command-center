@@ -150,13 +150,13 @@ export default function YearlyPlanningDashboard() {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-background p-4 md:p-8">
-        <div className="max-w-5xl mx-auto space-y-6">
-          <Skeleton className="h-10 w-64" />
-          <Skeleton className="h-12 w-full" />
-          <div className="grid md:grid-cols-2 gap-4">
-            <Skeleton className="h-48" />
-            <Skeleton className="h-48" />
+      <div className="min-h-screen bg-background p-4 md:p-8 pb-24 md:pb-8">
+        <div className="max-w-5xl mx-auto space-y-4 md:space-y-6">
+          <Skeleton className="h-8 md:h-10 w-48 md:w-64" />
+          <Skeleton className="h-10 md:h-12 w-full" />
+          <div className="grid gap-4">
+            <Skeleton className="h-40 md:h-48" />
+            <Skeleton className="h-40 md:h-48" />
           </div>
         </div>
       </div>
@@ -166,29 +166,29 @@ export default function YearlyPlanningDashboard() {
   // No yearly plan - show welcome screen
   if (!data.yearlyPlan) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 flex items-center justify-center p-4">
-        <div className="max-w-md w-full text-center animate-fade-in">
-          <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
-            <Flame className="w-10 h-10 text-primary" />
+      <div className="min-h-screen bg-gradient-to-b from-background to-muted/30 flex items-center justify-center p-4 pb-24 md:pb-4">
+        <div className="max-w-md w-full text-center animate-fade-in px-2">
+          <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4 md:mb-6">
+            <Flame className="w-8 h-8 md:w-10 md:h-10 text-primary" />
           </div>
           
-          <h1 className="text-3xl font-bold tracking-tight mb-3">
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight mb-2 md:mb-3">
             Welcome to {currentYear}
           </h1>
-          <p className="text-muted-foreground text-lg mb-8">
+          <p className="text-muted-foreground text-base md:text-lg mb-6 md:mb-8">
             Let's build your yearly plan. It takes about 10 minutes to set your foundation for an extraordinary year.
           </p>
 
           <Button 
             size="lg" 
             onClick={() => navigate('/yearly-planning/onboarding')}
-            className="gap-2"
+            className="gap-2 w-full sm:w-auto min-h-[48px]"
           >
             Start Your Plan
             <ArrowRight className="w-4 h-4" />
           </Button>
 
-          <p className="text-sm text-muted-foreground mt-4">
+          <p className="text-xs md:text-sm text-muted-foreground mt-4">
             You'll create your Life Resume, choose a theme, and design your Misogi challenge.
           </p>
         </div>
@@ -200,45 +200,53 @@ export default function YearlyPlanningDashboard() {
   const totalLifeResumeItems = data.lifeResume.reduce((sum, lr) => sum + lr.items.length, 0);
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-5xl mx-auto px-4 py-6 md:py-8">
+    <div className="min-h-screen bg-background pb-20 md:pb-0">
+      <div className="max-w-5xl mx-auto px-3 sm:px-4 py-4 md:py-8">
         {/* Header */}
-        <header className="mb-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+        <header className="mb-4 md:mb-6">
+          <div className="flex items-center justify-between gap-2">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight truncate">
                 {currentYear} Plan
               </h1>
-              <p className="text-muted-foreground text-sm md:text-base">
+              <p className="text-muted-foreground text-xs sm:text-sm md:text-base truncate">
                 {themeData.emoji} {themeData.title}
               </p>
             </div>
-            <Button variant="outline" size="sm" onClick={() => navigate('/yearly-planning/onboarding')}>
-              Edit Setup
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => navigate('/yearly-planning/onboarding')}
+              className="shrink-0 text-xs sm:text-sm min-h-[36px] px-2 sm:px-3"
+            >
+              <span className="hidden sm:inline">Edit Setup</span>
+              <span className="sm:hidden">Edit</span>
             </Button>
           </div>
         </header>
 
-        {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
-          <TabsList className="w-full justify-start overflow-x-auto bg-muted/50 p-1">
-            <TabsTrigger value="overview" className="gap-2">
-              <LayoutDashboard className="w-4 h-4" />
-              <span className="hidden sm:inline">Overview</span>
-            </TabsTrigger>
-            <TabsTrigger value="identity" className="gap-2">
-              <User className="w-4 h-4" />
-              <span className="hidden sm:inline">Identity</span>
-            </TabsTrigger>
-            <TabsTrigger value="goals" className="gap-2">
-              <Goal className="w-4 h-4" />
-              <span className="hidden sm:inline">Goals</span>
-            </TabsTrigger>
-            <TabsTrigger value="tracking" className="gap-2">
-              <ClipboardList className="w-4 h-4" />
-              <span className="hidden sm:inline">Tracking</span>
-            </TabsTrigger>
-          </TabsList>
+        {/* Tabs - Horizontally scrollable on mobile */}
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4 md:space-y-6">
+          <div className="overflow-x-auto -mx-3 sm:-mx-4 px-3 sm:px-4 scrollbar-hide">
+            <TabsList className="inline-flex w-auto min-w-full sm:w-full justify-start sm:justify-start bg-muted/50 p-1 gap-1">
+              <TabsTrigger value="overview" className="gap-1.5 sm:gap-2 min-h-[40px] px-3 sm:px-4 text-xs sm:text-sm flex-shrink-0">
+                <LayoutDashboard className="w-4 h-4" />
+                <span>Overview</span>
+              </TabsTrigger>
+              <TabsTrigger value="identity" className="gap-1.5 sm:gap-2 min-h-[40px] px-3 sm:px-4 text-xs sm:text-sm flex-shrink-0">
+                <User className="w-4 h-4" />
+                <span>Identity</span>
+              </TabsTrigger>
+              <TabsTrigger value="goals" className="gap-1.5 sm:gap-2 min-h-[40px] px-3 sm:px-4 text-xs sm:text-sm flex-shrink-0">
+                <Goal className="w-4 h-4" />
+                <span>Goals</span>
+              </TabsTrigger>
+              <TabsTrigger value="tracking" className="gap-1.5 sm:gap-2 min-h-[40px] px-3 sm:px-4 text-xs sm:text-sm flex-shrink-0">
+                <ClipboardList className="w-4 h-4" />
+                <span>Tracking</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="animate-fade-in">
@@ -250,41 +258,41 @@ export default function YearlyPlanningDashboard() {
           </TabsContent>
 
           {/* Identity Tab */}
-          <TabsContent value="identity" className="space-y-6 animate-fade-in">
+          <TabsContent value="identity" className="space-y-4 md:space-y-6 animate-fade-in">
             {/* Theme Display */}
             <Card className="bg-primary/5 border-primary/20">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Target className="w-5 h-5" />
+              <CardHeader className="pb-2 md:pb-4">
+                <CardTitle className="flex items-center gap-2 text-base md:text-lg">
+                  <Target className="w-4 h-4 md:w-5 md:h-5" />
                   {currentYear} Theme
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-4">
-                  <span className="text-4xl mb-2 block">{themeData.emoji}</span>
-                  <h2 className="text-2xl font-bold">{themeData.title}</h2>
+                <div className="text-center py-3 md:py-4">
+                  <span className="text-3xl md:text-4xl mb-2 block">{themeData.emoji}</span>
+                  <h2 className="text-xl md:text-2xl font-bold">{themeData.title}</h2>
                 </div>
               </CardContent>
             </Card>
 
             {/* Life Resume */}
             <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="flex items-center gap-2">
-                    <Trophy className="w-5 h-5" />
+              <CardHeader className="pb-2 md:pb-4">
+                <div className="flex items-center justify-between gap-2">
+                  <CardTitle className="flex items-center gap-2 text-base md:text-lg">
+                    <Trophy className="w-4 h-4 md:w-5 md:h-5" />
                     Life Resume
                   </CardTitle>
-                  <span className="text-sm text-muted-foreground">{totalLifeResumeItems} accomplishments</span>
+                  <span className="text-xs md:text-sm text-muted-foreground">{totalLifeResumeItems} items</span>
                 </div>
-                <CardDescription>Proof of who you are</CardDescription>
+                <CardDescription className="text-xs md:text-sm">Proof of who you are</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3 md:space-y-4">
                 {data.lifeResume.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Trophy className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                    <p>No life resume items yet</p>
-                    <Button variant="outline" size="sm" className="mt-3" onClick={() => navigate('/yearly-planning/onboarding')}>
+                  <div className="text-center py-6 md:py-8 text-muted-foreground">
+                    <Trophy className="w-10 h-10 md:w-12 md:h-12 mx-auto mb-3 opacity-30" />
+                    <p className="text-sm">No life resume items yet</p>
+                    <Button variant="outline" size="sm" className="mt-3 min-h-[40px]" onClick={() => navigate('/yearly-planning/onboarding')}>
                       Add Accomplishments
                     </Button>
                   </div>
@@ -292,16 +300,16 @@ export default function YearlyPlanningDashboard() {
                   data.lifeResume.map((resume) => {
                     const Icon = categoryIcons[resume.category] || Trophy;
                     return (
-                      <div key={resume.id} className="border rounded-lg p-4">
-                        <div className="flex items-center gap-2 mb-3">
+                      <div key={resume.id} className="border rounded-lg p-3 md:p-4">
+                        <div className="flex items-center gap-2 mb-2 md:mb-3">
                           <Icon className="w-4 h-4 text-primary" />
-                          <h3 className="font-medium">{categoryLabels[resume.category] || resume.category}</h3>
+                          <h3 className="font-medium text-sm md:text-base">{categoryLabels[resume.category] || resume.category}</h3>
                         </div>
                         <ul className="space-y-1">
                           {resume.items.map((item, i) => (
-                            <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
-                              <span className="text-primary">•</span>
-                              {item}
+                            <li key={i} className="text-xs md:text-sm text-muted-foreground flex items-start gap-2">
+                              <span className="text-primary shrink-0">•</span>
+                              <span className="break-words">{item}</span>
                             </li>
                           ))}
                         </ul>

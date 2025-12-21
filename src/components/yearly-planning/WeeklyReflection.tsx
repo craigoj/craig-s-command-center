@@ -208,42 +208,42 @@ export default function WeeklyReflection({ yearlyPlanId, theme }: WeeklyReflecti
   const isSunday = today.getDay() === 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       {/* Header Card */}
       <Card className="border-2 border-primary/20 bg-gradient-to-br from-background to-muted/30">
-        <CardHeader className="text-center pb-2">
+        <CardHeader className="text-center pb-2 px-4 md:px-6">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <Calendar className="w-5 h-5 text-primary" />
-            <CardDescription>
-              Week of {format(weekStart, 'MMM d')} - {format(weekEnd, 'MMM d, yyyy')}
+            <Calendar className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+            <CardDescription className="text-xs md:text-sm">
+              Week of {format(weekStart, 'MMM d')} - {format(weekEnd, 'MMM d')}
             </CardDescription>
           </div>
-          <CardTitle className="text-2xl">Weekly Reflection</CardTitle>
+          <CardTitle className="text-xl md:text-2xl">Weekly Reflection</CardTitle>
           {existingId && (
-            <Badge variant="secondary" className="mx-auto mt-2">
+            <Badge variant="secondary" className="mx-auto mt-2 text-xs">
               <Check className="w-3 h-3 mr-1" />
-              Reflection saved
+              Saved
             </Badge>
           )}
         </CardHeader>
-        <CardContent className="pt-0">
+        <CardContent className="pt-0 px-4 md:px-6">
           {/* Week Summary */}
           {weekSummary.daysLogged > 0 && (
-            <div className="flex justify-center gap-6 py-4 border-t border-border/50 mt-4">
+            <div className="flex justify-center gap-6 py-3 md:py-4 border-t border-border/50 mt-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-primary">{weekSummary.daysLogged}</div>
-                <div className="text-xs text-muted-foreground">Days logged</div>
+                <div className="text-xl md:text-2xl font-bold text-primary">{weekSummary.daysLogged}</div>
+                <div className="text-[10px] md:text-xs text-muted-foreground">Days logged</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-green-500">{weekSummary.lifeResumeWorthy}</div>
-                <div className="text-xs text-muted-foreground">Life-resume worthy</div>
+                <div className="text-xl md:text-2xl font-bold text-green-500">{weekSummary.lifeResumeWorthy}</div>
+                <div className="text-[10px] md:text-xs text-muted-foreground">Resume-worthy</div>
               </div>
             </div>
           )}
           
           {!isSunday && daysUntilSunday > 0 && (
-            <p className="text-center text-sm text-muted-foreground mt-2">
-              {daysUntilSunday === 1 ? "Tomorrow is reflection day" : `${daysUntilSunday} days until Sunday reflection`}
+            <p className="text-center text-xs md:text-sm text-muted-foreground mt-2">
+              {daysUntilSunday === 1 ? "Tomorrow is reflection day" : `${daysUntilSunday} days until Sunday`}
             </p>
           )}
         </CardContent>
@@ -251,20 +251,20 @@ export default function WeeklyReflection({ yearlyPlanId, theme }: WeeklyReflecti
 
       {/* Main Question */}
       <Card className="border-2">
-        <CardContent className="py-8">
-          <div className="text-center space-y-6">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-2">
-              <Sparkles className="w-8 h-8 text-primary" />
+        <CardContent className="py-6 md:py-8 px-4 md:px-6">
+          <div className="text-center space-y-4 md:space-y-6">
+            <div className="inline-flex items-center justify-center w-12 h-12 md:w-16 md:h-16 rounded-full bg-primary/10 mb-2">
+              <Sparkles className="w-6 h-6 md:w-8 md:h-8 text-primary" />
             </div>
-            <h2 className="text-xl md:text-2xl font-serif italic text-foreground/90 max-w-md mx-auto leading-relaxed">
+            <h2 className="text-lg md:text-xl lg:text-2xl font-serif italic text-foreground/90 max-w-md mx-auto leading-relaxed px-2">
               "Did I live a week I'd be proud to put on my Life Resume?"
             </h2>
             
-            <div className="flex justify-center gap-4 pt-4">
+            <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 pt-4">
               <Button
                 size="lg"
                 variant={proudOfWeek === true ? "default" : "outline"}
-                className={`min-w-[120px] h-14 text-lg gap-2 transition-all ${
+                className={`min-w-[140px] h-12 md:h-14 text-base md:text-lg gap-2 transition-all ${
                   proudOfWeek === true ? 'ring-2 ring-primary ring-offset-2' : ''
                 }`}
                 onClick={() => setProudOfWeek(true)}
@@ -275,7 +275,7 @@ export default function WeeklyReflection({ yearlyPlanId, theme }: WeeklyReflecti
               <Button
                 size="lg"
                 variant={proudOfWeek === false ? "destructive" : "outline"}
-                className={`min-w-[120px] h-14 text-lg gap-2 transition-all ${
+                className={`min-w-[140px] h-12 md:h-14 text-base md:text-lg gap-2 transition-all ${
                   proudOfWeek === false ? 'ring-2 ring-destructive ring-offset-2' : ''
                 }`}
                 onClick={() => setProudOfWeek(false)}
@@ -290,30 +290,30 @@ export default function WeeklyReflection({ yearlyPlanId, theme }: WeeklyReflecti
 
       {/* Theme Alignment */}
       <Card>
-        <CardHeader>
+        <CardHeader className="pb-2 md:pb-4 px-4 md:px-6">
           <div className="flex items-center gap-2">
-            <Target className="w-5 h-5 text-primary" />
-            <CardTitle className="text-lg">Theme Alignment</CardTitle>
+            <Target className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+            <CardTitle className="text-base md:text-lg">Theme Alignment</CardTitle>
           </div>
           {theme && (
-            <CardDescription>
-              How well did you live "{theme}" this week?
+            <CardDescription className="text-xs md:text-sm">
+              How well did you live "{theme}"?
             </CardDescription>
           )}
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 px-4 md:px-6">
           <div className="space-y-3">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">0%</span>
+              <span className="text-xs md:text-sm text-muted-foreground">0%</span>
               <div className="text-center">
-                <span className={`text-2xl font-bold ${getAlignmentColor(themeAlignment)}`}>
+                <span className={`text-xl md:text-2xl font-bold ${getAlignmentColor(themeAlignment)}`}>
                   {themeAlignment}%
                 </span>
-                <span className={`block text-sm ${getAlignmentColor(themeAlignment)}`}>
+                <span className={`block text-xs md:text-sm ${getAlignmentColor(themeAlignment)}`}>
                   {getAlignmentLabel(themeAlignment)}
                 </span>
               </div>
-              <span className="text-sm text-muted-foreground">100%</span>
+              <span className="text-xs md:text-sm text-muted-foreground">100%</span>
             </div>
             <Slider
               value={[themeAlignment]}
@@ -327,66 +327,66 @@ export default function WeeklyReflection({ yearlyPlanId, theme }: WeeklyReflecti
       </Card>
 
       {/* Reflection Prompts */}
-      <div className="space-y-4">
+      <div className="space-y-3 md:space-y-4">
         {/* Comfort Choices */}
         <Card>
-          <CardHeader className="pb-3">
+          <CardHeader className="pb-2 md:pb-3 px-4 md:px-6">
             <div className="flex items-center gap-2">
-              <Shield className="w-5 h-5 text-yellow-500" />
-              <CardTitle className="text-lg">What choices kept you comfortable?</CardTitle>
+              <Shield className="w-4 h-4 md:w-5 md:h-5 text-yellow-500 shrink-0" />
+              <CardTitle className="text-sm md:text-lg">What kept you comfortable?</CardTitle>
             </div>
-            <CardDescription>
+            <CardDescription className="text-xs md:text-sm">
               Be honest about where you played it safe
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-4 md:px-6">
             <Textarea
               value={comfortChoices}
               onChange={(e) => setComfortChoices(e.target.value)}
-              placeholder="I avoided the hard client call... I skipped the morning workout... I procrastinated on launching..."
-              className="min-h-[100px] resize-none"
+              placeholder="I avoided the hard client call..."
+              className="min-h-[80px] md:min-h-[100px] resize-none text-base"
             />
           </CardContent>
         </Card>
 
         {/* Action Choices */}
         <Card>
-          <CardHeader className="pb-3">
+          <CardHeader className="pb-2 md:pb-3 px-4 md:px-6">
             <div className="flex items-center gap-2">
-              <Rocket className="w-5 h-5 text-green-500" />
-              <CardTitle className="text-lg">What actions moved you forward?</CardTitle>
+              <Rocket className="w-4 h-4 md:w-5 md:h-5 text-green-500 shrink-0" />
+              <CardTitle className="text-sm md:text-lg">What moved you forward?</CardTitle>
             </div>
-            <CardDescription>
+            <CardDescription className="text-xs md:text-sm">
               Celebrate the steps you took
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-4 md:px-6">
             <Textarea
               value={actionChoices}
               onChange={(e) => setActionChoices(e.target.value)}
-              placeholder="I shipped the new feature... I had the difficult conversation... I showed up every day..."
-              className="min-h-[100px] resize-none"
+              placeholder="I shipped the new feature..."
+              className="min-h-[80px] md:min-h-[100px] resize-none text-base"
             />
           </CardContent>
         </Card>
 
         {/* Earned Respect */}
         <Card>
-          <CardHeader className="pb-3">
+          <CardHeader className="pb-2 md:pb-3 px-4 md:px-6">
             <div className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-purple-500" />
-              <CardTitle className="text-lg">What earned your self-respect?</CardTitle>
+              <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-purple-500 shrink-0" />
+              <CardTitle className="text-sm md:text-lg">What earned your self-respect?</CardTitle>
             </div>
-            <CardDescription>
+            <CardDescription className="text-xs md:text-sm">
               What would you do again?
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-4 md:px-6">
             <Textarea
               value={earnedRespect}
               onChange={(e) => setEarnedRespect(e.target.value)}
-              placeholder="I kept my word to myself... I pushed through when it was hard... I chose growth over comfort..."
-              className="min-h-[100px] resize-none"
+              placeholder="I kept my word to myself..."
+              className="min-h-[80px] md:min-h-[100px] resize-none text-base"
             />
           </CardContent>
         </Card>
@@ -394,12 +394,12 @@ export default function WeeklyReflection({ yearlyPlanId, theme }: WeeklyReflecti
 
       {/* Save Button */}
       <Card className="border-primary/20">
-        <CardContent className="py-6">
+        <CardContent className="py-4 md:py-6 px-4 md:px-6">
           <Button
             onClick={handleSave}
             disabled={saving}
             size="lg"
-            className="w-full h-14 text-lg"
+            className="w-full h-12 md:h-14 text-base md:text-lg min-h-[48px]"
           >
             {saving ? (
               <>
@@ -419,7 +419,7 @@ export default function WeeklyReflection({ yearlyPlanId, theme }: WeeklyReflecti
             )}
           </Button>
           
-          <p className="text-center text-sm text-muted-foreground mt-4">
+          <p className="text-center text-xs text-muted-foreground mt-3 md:mt-4 px-2">
             {proudOfWeek === null 
               ? "Answer all questions honestly. This is for you."
               : proudOfWeek 

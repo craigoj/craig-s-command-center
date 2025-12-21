@@ -194,26 +194,26 @@ export default function DailyScorecard({ compact = false, onSave }: DailyScoreca
 
   return (
     <Card className={compact ? '' : 'shadow-lg'}>
-      <CardHeader className="pb-4">
-        <div className="flex items-center justify-between">
+      <CardHeader className="pb-3 md:pb-4 px-4 md:px-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center shrink-0">
               <CheckCircle2 className="w-5 h-5 text-green-500" />
             </div>
-            <div>
-              <CardTitle className="text-lg">Daily Scorecard</CardTitle>
-              <CardDescription>{format(today, 'EEEE, MMMM d, yyyy')}</CardDescription>
+            <div className="min-w-0">
+              <CardTitle className="text-base md:text-lg">Daily Scorecard</CardTitle>
+              <CardDescription className="text-xs md:text-sm">{format(today, 'EEE, MMM d')}</CardDescription>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             {streak > 0 && (
-              <Badge variant="secondary" className="gap-1 bg-orange-500/10 text-orange-600">
+              <Badge variant="secondary" className="gap-1 bg-orange-500/10 text-orange-600 text-xs">
                 <Flame className="w-3 h-3" />
-                {streak}-day streak
+                {streak}-day
               </Badge>
             )}
             {existingScore && (
-              <Badge variant="secondary" className="gap-1 bg-green-500/10 text-green-600">
+              <Badge variant="secondary" className="gap-1 bg-green-500/10 text-green-600 text-xs">
                 <CheckCircle2 className="w-3 h-3" />
                 Logged
               </Badge>
@@ -221,75 +221,76 @@ export default function DailyScorecard({ compact = false, onSave }: DailyScoreca
           </div>
         </div>
       </CardHeader>
-      <CardContent className="space-y-5">
+      <CardContent className="space-y-4 md:space-y-5 px-4 md:px-6">
         {/* Hard thing */}
         <div className="space-y-2">
           <Label htmlFor="hard-thing" className="flex items-center gap-2 text-sm font-medium">
-            <Zap className="w-4 h-4 text-yellow-500" />
-            What hard thing did you do today?
+            <Zap className="w-4 h-4 text-yellow-500 shrink-0" />
+            <span>What hard thing did you do today?</span>
           </Label>
           <Textarea
             id="hard-thing"
             placeholder="Coded for 4 hours straight on new feature..."
             value={formData.hard_thing}
             onChange={(e) => setFormData({ ...formData, hard_thing: e.target.value })}
-            className="resize-none min-h-[80px]"
+            className="resize-none min-h-[80px] md:min-h-[80px] text-base"
           />
           <p className="text-xs text-muted-foreground">
-            The thing you did that required effort, discipline, or focus.
+            The thing that required effort, discipline, or focus.
           </p>
         </div>
 
         {/* Discomfort */}
         <div className="space-y-2">
           <Label htmlFor="discomfort" className="flex items-center gap-2 text-sm font-medium">
-            <Heart className="w-4 h-4 text-red-500" />
-            What discomfort did you face?
+            <Heart className="w-4 h-4 text-red-500 shrink-0" />
+            <span>What discomfort did you face?</span>
           </Label>
           <Textarea
             id="discomfort"
             placeholder="Had a difficult conversation with a client..."
             value={formData.discomfort_faced}
             onChange={(e) => setFormData({ ...formData, discomfort_faced: e.target.value })}
-            className="resize-none min-h-[80px]"
+            className="resize-none min-h-[80px] md:min-h-[80px] text-base"
           />
           <p className="text-xs text-muted-foreground">
-            Growth happens at the edge of comfort. What pushed you today?
+            Growth happens at the edge of comfort.
           </p>
         </div>
 
         {/* Small win */}
         <div className="space-y-2">
           <Label htmlFor="small-win" className="flex items-center gap-2 text-sm font-medium">
-            <Trophy className="w-4 h-4 text-primary" />
-            What small win happened?
+            <Trophy className="w-4 h-4 text-primary shrink-0" />
+            <span>What small win happened?</span>
           </Label>
           <Textarea
             id="small-win"
             placeholder="Got positive feedback from a user..."
             value={formData.small_win}
             onChange={(e) => setFormData({ ...formData, small_win: e.target.value })}
-            className="resize-none min-h-[80px]"
+            className="resize-none min-h-[80px] md:min-h-[80px] text-base"
           />
           <p className="text-xs text-muted-foreground">
-            Evidence matters. Capture the proof, no matter how small.
+            Evidence matters. Capture the proof.
           </p>
         </div>
 
         {/* Life resume worthy */}
-        <div className="flex items-start space-x-3 rounded-lg border p-4 bg-primary/5">
+        <div className="flex items-start space-x-3 rounded-lg border p-3 md:p-4 bg-primary/5">
           <Checkbox
             id="life-resume"
             checked={formData.life_resume_worthy}
             onCheckedChange={(checked) => setFormData({ ...formData, life_resume_worthy: !!checked })}
+            className="mt-0.5 h-5 w-5"
           />
-          <div className="space-y-1 leading-none">
-            <Label htmlFor="life-resume" className="flex items-center gap-2 cursor-pointer">
-              <Sparkles className="w-4 h-4 text-primary" />
-              This day is life-resume-worthy
+          <div className="space-y-1 leading-none min-w-0">
+            <Label htmlFor="life-resume" className="flex items-center gap-2 cursor-pointer text-sm md:text-base">
+              <Sparkles className="w-4 h-4 text-primary shrink-0" />
+              <span>Life-resume-worthy day</span>
             </Label>
             <p className="text-xs text-muted-foreground">
-              Would you proudly tell someone about what you did today?
+              Would you proudly tell someone about today?
             </p>
           </div>
         </div>
@@ -298,7 +299,7 @@ export default function DailyScorecard({ compact = false, onSave }: DailyScoreca
         <Button 
           onClick={handleSave} 
           disabled={saving || !hasChanges()}
-          className="w-full gap-2"
+          className="w-full gap-2 min-h-[48px] text-base"
           size="lg"
         >
           {saving ? (
@@ -317,7 +318,7 @@ export default function DailyScorecard({ compact = false, onSave }: DailyScoreca
         </Button>
 
         {/* Motivational footer */}
-        <p className="text-center text-xs text-muted-foreground italic">
+        <p className="text-center text-xs text-muted-foreground italic px-2">
           {streak === 0 && "Start your streak today. One day at a time."}
           {streak > 0 && streak < 7 && "Building momentum. Keep showing up!"}
           {streak >= 7 && streak < 30 && "One week strong! Consistency is your superpower."}

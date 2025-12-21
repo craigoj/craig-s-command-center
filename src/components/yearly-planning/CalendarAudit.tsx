@@ -276,48 +276,49 @@ export default function CalendarAudit() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 md:space-y-6">
       {/* Header */}
       <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
+        <CardHeader className="px-4 md:px-6 pb-3 md:pb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
-              <CardTitle className="flex items-center gap-2">
-                <CalendarIcon className="w-5 h-5 text-primary" />
+              <CardTitle className="flex items-center gap-2 text-base md:text-lg">
+                <CalendarIcon className="w-4 h-4 md:w-5 md:h-5 text-primary" />
                 Calendar Audit
               </CardTitle>
-              <CardDescription>
-                Week of {format(weekStart, 'MMM d')} - {format(weekEnd, 'MMM d, yyyy')}
+              <CardDescription className="text-xs md:text-sm">
+                Week of {format(weekStart, 'MMM d')} - {format(weekEnd, 'MMM d')}
               </CardDescription>
             </div>
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
-                <Button onClick={openNew} className="gap-2">
+                <Button onClick={openNew} className="gap-2 w-full sm:w-auto min-h-[44px]">
                   <Plus className="w-4 h-4" />
-                  Add Time Block
+                  Add Block
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-md">
+              <DialogContent className="max-w-[95vw] sm:max-w-md max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>{editingId ? 'Edit' : 'Add'} Time Block</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4 pt-4">
                   {/* Title */}
                   <div className="space-y-2">
-                    <Label>Activity Title *</Label>
+                    <Label className="text-sm">Activity Title *</Label>
                     <Input
                       value={formData.title}
                       onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                       placeholder="Deep work session"
+                      className="text-base min-h-[44px]"
                     />
                   </div>
 
                   {/* Date */}
                   <div className="space-y-2">
-                    <Label>Date</Label>
+                    <Label className="text-sm">Date</Label>
                     <Popover open={dateOpen} onOpenChange={setDateOpen}>
                       <PopoverTrigger asChild>
-                        <Button variant="outline" className="w-full justify-start">
+                        <Button variant="outline" className="w-full justify-start min-h-[44px]">
                           <CalendarIcon className="w-4 h-4 mr-2" />
                           {format(formData.date, 'PPP')}
                         </Button>
@@ -340,28 +341,30 @@ export default function CalendarAudit() {
                   </div>
 
                   {/* Time */}
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-2">
-                      <Label>Start Time</Label>
+                      <Label className="text-sm">Start</Label>
                       <Input
                         type="time"
                         value={formData.startTime}
                         onChange={(e) => setFormData(prev => ({ ...prev, startTime: e.target.value }))}
+                        className="min-h-[44px]"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>End Time</Label>
+                      <Label className="text-sm">End</Label>
                       <Input
                         type="time"
                         value={formData.endTime}
                         onChange={(e) => setFormData(prev => ({ ...prev, endTime: e.target.value }))}
+                        className="min-h-[44px]"
                       />
                     </div>
                   </div>
 
-                  {/* Category */}
+                  {/* Category - Touch optimized */}
                   <div className="space-y-2">
-                    <Label>Category *</Label>
+                    <Label className="text-sm">Category *</Label>
                     <div className="grid grid-cols-3 gap-2">
                       {(Object.keys(categoryConfig) as Array<keyof typeof categoryConfig>).map((key) => {
                         const cat = categoryConfig[key];
@@ -372,27 +375,24 @@ export default function CalendarAudit() {
                             type="button"
                             onClick={() => setFormData(prev => ({ ...prev, colorCategory: key }))}
                             className={cn(
-                              "p-3 rounded-lg border-2 text-center transition-all",
+                              "p-3 rounded-lg border-2 text-center transition-all min-h-[72px]",
                               isSelected ? `${cat.bgLight} ${cat.border}` : "border-border hover:border-muted-foreground/50"
                             )}
                           >
                             <span className="text-xl block mb-1">{cat.emoji}</span>
-                            <span className={cn("text-sm font-medium", isSelected && cat.textColor)}>
+                            <span className={cn("text-xs font-medium", isSelected && cat.textColor)}>
                               {cat.label}
                             </span>
                           </button>
                         );
                       })}
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      {categoryConfig[formData.colorCategory].examples}
-                    </p>
                   </div>
 
                   {/* Quality Rating */}
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <Label>Quality Rating</Label>
+                      <Label className="text-sm">Quality</Label>
                       <span className="text-sm font-medium">{formData.qualityRating}/10</span>
                     </div>
                     <Slider
@@ -405,16 +405,17 @@ export default function CalendarAudit() {
 
                   {/* Notes */}
                   <div className="space-y-2">
-                    <Label>Notes (optional)</Label>
+                    <Label className="text-sm">Notes (optional)</Label>
                     <Textarea
                       value={formData.notes}
                       onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-                      placeholder="Any reflections on this time block..."
+                      placeholder="Reflections..."
                       rows={2}
+                      className="text-base"
                     />
                   </div>
 
-                  <Button onClick={handleSave} disabled={saving} className="w-full">
+                  <Button onClick={handleSave} disabled={saving} className="w-full min-h-[48px]">
                     {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                     {editingId ? 'Update' : 'Add'} Time Block
                   </Button>
