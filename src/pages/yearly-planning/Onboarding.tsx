@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { ChevronLeft, ChevronRight, Sparkles, Target, Trophy, Check } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Sparkles, Target, Trophy, Check, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { LifeResumeBuilder, LifeResumeBuilderRef } from '@/components/yearly-planning/LifeResumeBuilder';
+import { toast } from 'sonner';
 
 const steps = [
   {
@@ -27,7 +29,7 @@ const steps = [
     id: 3,
     title: 'Misogi Challenge',
     subtitle: 'Your Impossible Goal',
-    description: 'Define ONE audacious challenge that will test your limits and redefine what\'s possible.',
+    description: "Define ONE audacious challenge that will test your limits and redefine what's possible.",
     icon: Sparkles,
     encouragement: 'The impossible becomes possible through daily action.',
   },
@@ -37,19 +39,48 @@ export default function YearlyPlanningOnboarding() {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [stepData, setStepData] = useState({
+    step1HasData: false,
+    step2HasData: false,
+    step3HasData: false,
+  });
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Refs for step components
+  const lifeResumeRef = useRef<LifeResumeBuilderRef>(null);
 
   const currentStepData = steps.find(s => s.id === currentStep)!;
   const progress = (currentStep / steps.length) * 100;
   const isLastStep = currentStep === steps.length;
   const isFirstStep = currentStep === 1;
 
-  const handleNext = () => {
+  // Check if current step can proceed
+  const canProceed = useCallback(() => {
+    if (currentStep === 1) return stepData.step1HasData;
+    // Steps 2 and 3 will have their own validation
+    return true;
+  }, [currentStep, stepData]);
+
+  const handleNext = async () => {
+    // Save data before proceeding
+    if (currentStep === 1 && lifeResumeRef.current) {
+      setIsSaving(true);
+      try {
+        await lifeResumeRef.current.saveAll();
+        toast.success('Life Resume saved!');
+      } catch (error) {
+        toast.error('Failed to save. Please try again.');
+        setIsSaving(false);
+        return;
+      }
+      setIsSaving(false);
+    }
+
     if (!completedSteps.includes(currentStep)) {
       setCompletedSteps([...completedSteps, currentStep]);
     }
     
     if (isLastStep) {
-      // Complete onboarding and go to dashboard
       navigate('/yearly-planning');
     } else {
       setCurrentStep(currentStep + 1);
@@ -67,6 +98,13 @@ export default function YearlyPlanningOnboarding() {
       navigate('/yearly-planning');
     } else {
       setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const handleStepClick = (stepId: number) => {
+    // Only allow going to completed steps or current step
+    if (completedSteps.includes(stepId) || stepId === currentStep || stepId < currentStep) {
+      setCurrentStep(stepId);
     }
   };
 
@@ -98,16 +136,19 @@ export default function YearlyPlanningOnboarding() {
           {steps.map((step, index) => {
             const isCompleted = completedSteps.includes(step.id);
             const isCurrent = step.id === currentStep;
+            const canClick = isCompleted || step.id <= currentStep;
             
             return (
               <div key={step.id} className="flex items-center">
                 <button
-                  onClick={() => setCurrentStep(step.id)}
+                  onClick={() => canClick && handleStepClick(step.id)}
+                  disabled={!canClick}
                   className={cn(
                     "w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all",
                     isCurrent && "bg-primary text-primary-foreground ring-4 ring-primary/20",
-                    isCompleted && !isCurrent && "bg-primary/20 text-primary",
-                    !isCurrent && !isCompleted && "bg-muted text-muted-foreground"
+                    isCompleted && !isCurrent && "bg-primary/20 text-primary hover:bg-primary/30",
+                    !isCurrent && !isCompleted && "bg-muted text-muted-foreground",
+                    canClick && !isCurrent && "cursor-pointer"
                   )}
                 >
                   {isCompleted && !isCurrent ? (
@@ -129,29 +170,29 @@ export default function YearlyPlanningOnboarding() {
       </div>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col items-center justify-center px-4 py-8">
+      <main className="flex-1 flex flex-col items-center px-4 py-4 md:py-8">
         <div className="w-full max-w-lg animate-fade-in" key={currentStep}>
           {/* Icon */}
-          <div className="flex justify-center mb-6">
-            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
-              <StepIcon className="w-10 h-10 text-primary" />
+          <div className="flex justify-center mb-4 md:mb-6">
+            <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-primary/10 flex items-center justify-center">
+              <StepIcon className="w-8 h-8 md:w-10 md:h-10 text-primary" />
             </div>
           </div>
 
           {/* Title */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-6">
             <p className="text-sm font-medium text-primary mb-2">{currentStepData.subtitle}</p>
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight mb-2">
               {currentStepData.title}
             </h1>
-            <p className="text-muted-foreground text-lg max-w-md mx-auto">
+            <p className="text-muted-foreground text-sm md:text-base max-w-md mx-auto">
               {currentStepData.description}
             </p>
           </div>
 
           {/* Step Content Card */}
-          <Card className="mb-6 shadow-lg border-2">
-            <CardHeader>
+          <Card className="mb-4 shadow-lg border-2">
+            <CardHeader className="pb-2">
               <CardTitle className="text-lg">
                 {currentStep === 1 && 'Build Your Life Resume'}
                 {currentStep === 2 && 'Choose Your Theme'}
@@ -164,18 +205,38 @@ export default function YearlyPlanningOnboarding() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {/* Placeholder content - will be replaced with actual step components */}
-              <div className="py-12 flex flex-col items-center justify-center text-center border-2 border-dashed border-muted rounded-lg bg-muted/30">
-                <StepIcon className="w-12 h-12 text-muted-foreground/50 mb-3" />
-                <p className="text-muted-foreground text-sm">
-                  Step {currentStep} content will be implemented here
-                </p>
-              </div>
+              {/* Step 1: Life Resume Builder */}
+              {currentStep === 1 && (
+                <LifeResumeBuilder 
+                  ref={lifeResumeRef}
+                  onDataChange={(hasData) => setStepData(prev => ({ ...prev, step1HasData: hasData }))}
+                  onSaving={setIsSaving}
+                />
+              )}
+
+              {/* Placeholder for steps 2 and 3 */}
+              {currentStep === 2 && (
+                <div className="py-12 flex flex-col items-center justify-center text-center border-2 border-dashed border-muted rounded-lg bg-muted/30">
+                  <Target className="w-12 h-12 text-muted-foreground/50 mb-3" />
+                  <p className="text-muted-foreground text-sm">
+                    Theme Selector will be implemented here
+                  </p>
+                </div>
+              )}
+
+              {currentStep === 3 && (
+                <div className="py-12 flex flex-col items-center justify-center text-center border-2 border-dashed border-muted rounded-lg bg-muted/30">
+                  <Sparkles className="w-12 h-12 text-muted-foreground/50 mb-3" />
+                  <p className="text-muted-foreground text-sm">
+                    Misogi Creator will be implemented here
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
           {/* Encouragement Quote */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-4">
             <p className="text-sm italic text-muted-foreground">
               "{currentStepData.encouragement}"
             </p>
@@ -190,7 +251,7 @@ export default function YearlyPlanningOnboarding() {
             <Button
               variant="ghost"
               onClick={handleBack}
-              disabled={isFirstStep}
+              disabled={isFirstStep || isSaving}
               className="gap-2"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -200,10 +261,20 @@ export default function YearlyPlanningOnboarding() {
             <Button
               onClick={handleNext}
               size="lg"
+              disabled={(currentStep === 1 && !canProceed()) || isSaving}
               className="gap-2 min-w-[140px]"
             >
-              {isLastStep ? 'Complete Setup' : 'Continue'}
-              {!isLastStep && <ChevronRight className="w-4 h-4" />}
+              {isSaving ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  {isLastStep ? 'Complete Setup' : 'Continue'}
+                  {!isLastStep && <ChevronRight className="w-4 h-4" />}
+                </>
+              )}
             </Button>
           </div>
         </div>
