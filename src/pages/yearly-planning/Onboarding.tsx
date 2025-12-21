@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,8 +6,9 @@ import { Progress } from '@/components/ui/progress';
 import { ChevronLeft, ChevronRight, Sparkles, Target, Trophy, Check, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LifeResumeBuilder, LifeResumeBuilderRef } from '@/components/yearly-planning/LifeResumeBuilder';
+import ThemeSelector, { ThemeSelectorRef } from '@/components/yearly-planning/ThemeSelector';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-
 const steps = [
   {
     id: 1,
@@ -45,9 +46,38 @@ export default function YearlyPlanningOnboarding() {
     step3HasData: false,
   });
   const [isSaving, setIsSaving] = useState(false);
+  const [yearlyPlanId, setYearlyPlanId] = useState<string | null>(null);
+  const [currentTheme, setCurrentTheme] = useState<string | null>(null);
 
   // Refs for step components
   const lifeResumeRef = useRef<LifeResumeBuilderRef>(null);
+  const themeSelectorRef = useRef<ThemeSelectorRef>(null);
+
+  // Load existing yearly plan data
+  useEffect(() => {
+    const loadYearlyPlan = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const currentYear = new Date().getFullYear();
+      const { data } = await supabase
+        .from('yearly_plans')
+        .select('id, theme')
+        .eq('user_id', user.id)
+        .eq('year', currentYear)
+        .maybeSingle();
+
+      if (data) {
+        setYearlyPlanId(data.id);
+        setCurrentTheme(data.theme);
+        if (data.theme) {
+          setStepData(prev => ({ ...prev, step2HasData: true }));
+        }
+      }
+    };
+
+    loadYearlyPlan();
+  }, []);
 
   const currentStepData = steps.find(s => s.id === currentStep)!;
   const progress = (currentStep / steps.length) * 100;
@@ -57,7 +87,8 @@ export default function YearlyPlanningOnboarding() {
   // Check if current step can proceed
   const canProceed = useCallback(() => {
     if (currentStep === 1) return stepData.step1HasData;
-    // Steps 2 and 3 will have their own validation
+    if (currentStep === 2) return stepData.step2HasData;
+    // Step 3 will have its own validation
     return true;
   }, [currentStep, stepData]);
 
@@ -67,6 +98,20 @@ export default function YearlyPlanningOnboarding() {
       setIsSaving(true);
       try {
         await lifeResumeRef.current.saveAll();
+        // Update yearlyPlanId after creating the plan
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const currentYear = new Date().getFullYear();
+          const { data } = await supabase
+            .from('yearly_plans')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('year', currentYear)
+            .maybeSingle();
+          if (data) {
+            setYearlyPlanId(data.id);
+          }
+        }
         toast.success('Life Resume saved!');
       } catch (error) {
         toast.error('Failed to save. Please try again.');
@@ -74,6 +119,12 @@ export default function YearlyPlanningOnboarding() {
         return;
       }
       setIsSaving(false);
+    }
+
+    // Step 2 auto-saves, just validate
+    if (currentStep === 2 && !stepData.step2HasData) {
+      toast.error('Please select a theme to continue');
+      return;
     }
 
     if (!completedSteps.includes(currentStep)) {
@@ -214,14 +265,17 @@ export default function YearlyPlanningOnboarding() {
                 />
               )}
 
-              {/* Placeholder for steps 2 and 3 */}
+              {/* Step 2: Theme Selector */}
               {currentStep === 2 && (
-                <div className="py-12 flex flex-col items-center justify-center text-center border-2 border-dashed border-muted rounded-lg bg-muted/30">
-                  <Target className="w-12 h-12 text-muted-foreground/50 mb-3" />
-                  <p className="text-muted-foreground text-sm">
-                    Theme Selector will be implemented here
-                  </p>
-                </div>
+                <ThemeSelector
+                  ref={themeSelectorRef}
+                  yearlyPlanId={yearlyPlanId}
+                  initialTheme={currentTheme || undefined}
+                  onThemeSelect={(theme) => {
+                    setCurrentTheme(theme);
+                    setStepData(prev => ({ ...prev, step2HasData: true }));
+                  }}
+                />
               )}
 
               {currentStep === 3 && (
@@ -261,7 +315,7 @@ export default function YearlyPlanningOnboarding() {
             <Button
               onClick={handleNext}
               size="lg"
-              disabled={(currentStep === 1 && !canProceed()) || isSaving}
+              disabled={!canProceed() || isSaving}
               className="gap-2 min-w-[140px]"
             >
               {isSaving ? (
