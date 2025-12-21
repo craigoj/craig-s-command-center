@@ -42,6 +42,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { format, differenceInDays, parseISO, isAfter } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { motion, AnimatePresence, AnimatedProgress, AnimatedFlame } from '@/components/ui/animations';
+import { useConfetti } from '@/hooks/useConfetti';
 
 interface Misogi {
   id: string;
@@ -84,6 +86,7 @@ const milestoneMessages: Record<number, string> = {
 
 export default function GoalsTab({ misogi: initialMisogi, yearlyPlanId, onMisogiUpdate }: GoalsTabProps) {
   const navigate = useNavigate();
+  const { fireCelebration } = useConfetti();
   const [misogi, setMisogi] = useState<Misogi | null>(initialMisogi);
   const [progressValue, setProgressValue] = useState(initialMisogi?.completion_percentage || 0);
   const [saving, setSaving] = useState(false);
@@ -195,6 +198,7 @@ export default function GoalsTab({ misogi: initialMisogi, yearlyPlanId, onMisogi
         if (previousValue < milestone && clampedValue >= milestone) {
           toast.success(milestoneMessages[milestone]);
           if (milestone === 100) {
+            fireCelebration();
             setShowCelebration(true);
             setTimeout(() => setShowCelebration(false), 3000);
           }
@@ -242,6 +246,7 @@ export default function GoalsTab({ misogi: initialMisogi, yearlyPlanId, onMisogi
       onMisogiUpdate(updatedMisogi);
 
       if (newStatus === 'completed') {
+        fireCelebration();
         setShowCelebration(true);
         setTimeout(() => setShowCelebration(false), 3000);
       }
@@ -316,8 +321,13 @@ export default function GoalsTab({ misogi: initialMisogi, yearlyPlanId, onMisogi
   // No Misogi state
   if (!misogi) {
     return (
-      <div className="space-y-6">
-        <Card>
+      <motion.div 
+        className="space-y-6"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        <Card className="overflow-hidden">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-orange-500" />
@@ -326,40 +336,64 @@ export default function GoalsTab({ misogi: initialMisogi, yearlyPlanId, onMisogi
             <CardDescription>Your impossible goal for the year</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-center py-12">
-              <div className="w-20 h-20 rounded-full bg-orange-500/10 flex items-center justify-center mx-auto mb-4">
+            <motion.div 
+              className="text-center py-12"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.4 }}
+            >
+              <motion.div 
+                className="w-20 h-20 rounded-full bg-orange-500/10 flex items-center justify-center mx-auto mb-4"
+                animate={{ 
+                  scale: [1, 1.05, 1],
+                  rotate: [0, 5, -5, 0]
+                }}
+                transition={{ 
+                  duration: 2, 
+                  repeat: Infinity, 
+                  repeatDelay: 3 
+                }}
+              >
                 <Sparkles className="w-10 h-10 text-orange-500" />
-              </div>
+              </motion.div>
               <h3 className="text-lg font-semibold mb-2">No Misogi Set</h3>
               <p className="text-muted-foreground text-sm mb-6 max-w-sm mx-auto">
                 A Misogi is ONE impossible-seeming challenge that drives daily discipline. 
                 Create yours to transform your year.
               </p>
-              <Button onClick={() => navigate('/yearly-planning/onboarding')} className="gap-2">
-                <Sparkles className="w-4 h-4" />
-                Create Misogi
-              </Button>
-            </div>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button onClick={() => navigate('/yearly-planning/onboarding')} className="gap-2">
+                  <Sparkles className="w-4 h-4" />
+                  Create Misogi
+                </Button>
+              </motion.div>
+            </motion.div>
           </CardContent>
         </Card>
 
         {/* Constraints Placeholder */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Goal className="w-5 h-5" />
-              Constraints
-            </CardTitle>
-            <CardDescription>Rules that keep you focused</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded-lg">
-              <Goal className="w-12 h-12 mx-auto mb-3 opacity-30" />
-              <p className="text-sm">Constraints feature coming soon</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.4 }}
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Goal className="w-5 h-5" />
+                Constraints
+              </CardTitle>
+              <CardDescription>Rules that keep you focused</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded-lg">
+                <Goal className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                <p className="text-sm">Constraints feature coming soon</p>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </motion.div>
     );
   }
 
@@ -368,17 +402,57 @@ export default function GoalsTab({ misogi: initialMisogi, yearlyPlanId, onMisogi
   const status = statusConfig[misogi.status] || statusConfig.planned;
 
   return (
-    <div className="space-y-6">
+    <motion.div 
+      className="space-y-6"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
       {/* Celebration overlay */}
-      {showCelebration && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm animate-fade-in">
-          <div className="text-center space-y-4">
-            <PartyPopper className="w-24 h-24 text-primary mx-auto animate-bounce" />
-            <h2 className="text-3xl font-bold">MISOGI COMPLETE! 🎉</h2>
-            <p className="text-muted-foreground">You did the impossible. You're legendary.</p>
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {showCelebration && (
+          <motion.div 
+            className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div 
+              className="text-center space-y-4"
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            >
+              <motion.div
+                animate={{ 
+                  rotate: [0, -10, 10, -10, 10, 0],
+                  scale: [1, 1.2, 1]
+                }}
+                transition={{ duration: 0.5, repeat: 3 }}
+              >
+                <PartyPopper className="w-24 h-24 text-primary mx-auto" />
+              </motion.div>
+              <motion.h2 
+                className="text-3xl font-bold"
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.2 }}
+              >
+                MISOGI COMPLETE! 🎉
+              </motion.h2>
+              <motion.p 
+                className="text-muted-foreground"
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.3 }}
+              >
+                You did the impossible. You're legendary.
+              </motion.p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Main Misogi Card */}
       <Card className="overflow-hidden">
@@ -633,6 +707,6 @@ export default function GoalsTab({ misogi: initialMisogi, yearlyPlanId, onMisogi
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </motion.div>
   );
 }
