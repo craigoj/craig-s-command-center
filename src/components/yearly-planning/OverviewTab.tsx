@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { format, differenceInDays, startOfWeek, parseISO, isAfter, isBefore, addDays } from 'date-fns';
+import { motion } from '@/components/ui/animations';
 
 interface YearlyPlan {
   id: string;
@@ -232,103 +233,168 @@ export default function OverviewTab({ yearlyPlan, misogi, onTabChange }: Overvie
   }
 
   return (
-    <div className="space-y-6">
+    <motion.div 
+      className="space-y-6"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
       {/* Theme Card - Hero */}
-      <Card className="bg-gradient-to-br from-primary/10 via-primary/5 to-background border-primary/20 overflow-hidden relative">
-        <div className="absolute top-0 right-0 text-[120px] leading-none opacity-10 select-none pointer-events-none">
-          {theme.emoji}
-        </div>
-        <CardHeader className="pb-2">
-          <CardDescription className="text-primary font-medium">
-            {currentYear} Theme
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <span className="text-4xl">{theme.emoji}</span>
-              <h2 className="text-2xl md:text-3xl font-bold text-foreground">
-                {theme.title}
-              </h2>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        <Card className="bg-gradient-to-br from-primary/10 via-primary/5 to-background border-primary/20 overflow-hidden relative hover-glow">
+          <motion.div 
+            className="absolute top-0 right-0 text-[120px] leading-none opacity-10 select-none pointer-events-none"
+            animate={{ 
+              scale: [1, 1.05, 1],
+              rotate: [0, 2, -2, 0]
+            }}
+            transition={{ 
+              duration: 4, 
+              repeat: Infinity, 
+              ease: 'easeInOut' 
+            }}
+          >
+            {theme.emoji}
+          </motion.div>
+          <CardHeader className="pb-2">
+            <CardDescription className="text-primary font-medium">
+              {currentYear} Theme
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <motion.span 
+                  className="text-4xl"
+                  animate={{ scale: [1, 1.1, 1] }}
+                  transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                >
+                  {theme.emoji}
+                </motion.span>
+                <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+                  {theme.title}
+                </h2>
+              </div>
             </div>
-          </div>
-          <div className="bg-background/60 backdrop-blur-sm rounded-lg p-4 border">
-            <p className="text-sm text-muted-foreground mb-1">When making decisions, ask:</p>
-            <p className="text-lg font-medium text-foreground italic">
-              "{theme.filter}"
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+            <div className="bg-background/60 backdrop-blur-sm rounded-lg p-4 border">
+              <p className="text-sm text-muted-foreground mb-1">When making decisions, ask:</p>
+              <p className="text-lg font-medium text-foreground italic">
+                "{theme.filter}"
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
 
       {/* Main Grid */}
       <div className="grid md:grid-cols-2 gap-4">
         {/* Misogi Progress */}
-        <Card className="hover:shadow-md transition-shadow">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-orange-500/10 flex items-center justify-center">
-                  <Sparkles className="w-4 h-4 text-orange-500" />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+          whileHover={{ y: -4, transition: { duration: 0.2 } }}
+        >
+          <Card className="h-full hover:shadow-lg transition-shadow">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <motion.div 
+                    className="w-8 h-8 rounded-full bg-orange-500/10 flex items-center justify-center"
+                    whileHover={{ scale: 1.1, rotate: 10 }}
+                  >
+                    <Sparkles className="w-4 h-4 text-orange-500" />
+                  </motion.div>
+                  <CardTitle className="text-base">Misogi Challenge</CardTitle>
                 </div>
-                <CardTitle className="text-base">Misogi Challenge</CardTitle>
-              </div>
-              {misogi && (
-                <span className={`text-xs px-2 py-1 rounded-full ${
-                  misogi.status === 'completed' 
-                    ? 'bg-green-500/10 text-green-600' 
-                    : misogi.status === 'in_progress'
-                    ? 'bg-orange-500/10 text-orange-600'
-                    : 'bg-muted text-muted-foreground'
-                }`}>
-                  {misogi.status === 'in_progress' ? 'In Progress' : misogi.status}
-                </span>
-              )}
-            </div>
-          </CardHeader>
-          <CardContent>
-            {misogi ? (
-              <div className="space-y-4">
-                <p className="font-medium text-foreground line-clamp-2">{misogi.title}</p>
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-muted-foreground">Progress</span>
-                    <span className="font-semibold text-primary">{misogi.completion_percentage}%</span>
-                  </div>
-                  <Progress value={misogi.completion_percentage} className="h-2" />
-                </div>
-                {misogiDaysRemaining !== null && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Clock className="w-4 h-4" />
-                    <span>
-                      {misogiDaysRemaining > 0 
-                        ? `${misogiDaysRemaining} days remaining`
-                        : 'Challenge period ended'
-                      }
-                    </span>
-                  </div>
+                {misogi && (
+                  <span className={`text-xs px-2 py-1 rounded-full ${
+                    misogi.status === 'completed' 
+                      ? 'bg-green-500/10 text-green-600' 
+                      : misogi.status === 'in_progress'
+                      ? 'bg-orange-500/10 text-orange-600'
+                      : 'bg-muted text-muted-foreground'
+                  }`}>
+                    {misogi.status === 'in_progress' ? 'In Progress' : misogi.status}
+                  </span>
                 )}
               </div>
-            ) : (
-              <div className="text-center py-4">
-                <p className="text-muted-foreground text-sm mb-3">No Misogi challenge set</p>
-                <Button variant="outline" size="sm" onClick={() => navigate('/yearly-planning/onboarding')}>
-                  Create Misogi
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+            </CardHeader>
+            <CardContent>
+              {misogi ? (
+                <div className="space-y-4">
+                  <p className="font-medium text-foreground line-clamp-2">{misogi.title}</p>
+                  <div>
+                    <div className="flex justify-between text-sm mb-2">
+                      <span className="text-muted-foreground">Progress</span>
+                      <motion.span 
+                        key={misogi.completion_percentage}
+                        className="font-semibold text-primary"
+                        initial={{ scale: 1.2 }}
+                        animate={{ scale: 1 }}
+                      >
+                        {misogi.completion_percentage}%
+                      </motion.span>
+                    </div>
+                    <div className="relative h-2 bg-muted rounded-full overflow-hidden">
+                      <motion.div
+                        className="absolute inset-y-0 left-0 bg-primary rounded-full"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${misogi.completion_percentage}%` }}
+                        transition={{ duration: 0.8, ease: 'easeOut' }}
+                      />
+                    </div>
+                  </div>
+                  {misogiDaysRemaining !== null && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Clock className="w-4 h-4" />
+                      <span>
+                        {misogiDaysRemaining > 0 
+                          ? `${misogiDaysRemaining} days remaining`
+                          : 'Challenge period ended'
+                        }
+                      </span>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-4">
+                  <p className="text-muted-foreground text-sm mb-3">No Misogi challenge set</p>
+                  <Button variant="outline" size="sm" onClick={() => navigate('/yearly-planning/onboarding')}>
+                    Create Misogi
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
 
         {/* Streak Card */}
-        <Card className="hover:shadow-md transition-shadow">
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-orange-500/10 flex items-center justify-center">
-                <Flame className="w-4 h-4 text-orange-500" />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+          whileHover={{ y: -4, transition: { duration: 0.2 } }}
+        >
+          <Card className="h-full hover:shadow-lg transition-shadow">
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-2">
+                <motion.div 
+                  className="w-8 h-8 rounded-full bg-orange-500/10 flex items-center justify-center"
+                  animate={streak > 0 ? { 
+                    scale: [1, 1.1, 1],
+                    rotate: [0, -5, 5, 0]
+                  } : {}}
+                  transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
+                >
+                  <Flame className="w-4 h-4 text-orange-500" />
+                </motion.div>
+                <CardTitle className="text-base">Daily Streak</CardTitle>
               </div>
-              <CardTitle className="text-base">Daily Streak</CardTitle>
-            </div>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-4">
@@ -351,7 +417,8 @@ export default function OverviewTab({ yearlyPlan, misogi, onTabChange }: Overvie
               Log Today's Score
             </Button>
           </CardContent>
-        </Card>
+          </Card>
+        </motion.div>
 
         {/* This Week Card */}
         <Card className="hover:shadow-md transition-shadow">
@@ -519,6 +586,6 @@ export default function OverviewTab({ yearlyPlan, misogi, onTabChange }: Overvie
           </div>
         </CardContent>
       </Card>
-    </div>
+    </motion.div>
   );
 }

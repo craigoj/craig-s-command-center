@@ -74,4 +74,33 @@ All colors MUST be HSL.
   .touch-target {
     @apply min-h-[44px] min-w-[44px];
   }
+  
+  .hover-lift {
+    @apply transition-all duration-200 hover:-translate-y-1 hover:shadow-lg;
+  }
+  
+  .hover-glow {
+    @apply transition-all duration-300 hover:shadow-[0_0_20px_hsl(var(--primary)/0.3)];
+  }
+  
+  .success-pulse {
+    animation: pulse-glow 1s ease-out;
+  }
+  
+  /* Smooth progress bar transitions */
+  .progress-smooth [data-state="indeterminate"] > div,
+  .progress-smooth [role="progressbar"] > div {
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* Respect reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 }
