@@ -89,7 +89,10 @@ export default function YearlyPlanningDashboard() {
     misogi: null,
   });
 
-  const currentYear = new Date().getFullYear();
+  // Use next year for planning if we're in November or December
+  const today = new Date();
+  const currentMonth = today.getMonth(); // 0-indexed (11 = December)
+  const currentYear = currentMonth >= 10 ? today.getFullYear() + 1 : today.getFullYear();
   const activeTab = searchParams.get('tab') || 'overview';
 
   const handleTabChange = (value: string) => {
