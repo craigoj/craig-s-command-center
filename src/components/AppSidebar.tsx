@@ -1,4 +1,4 @@
-import { Home, Sun, Calendar, RefreshCw } from "lucide-react";
+import { Home, Sun, Calendar, RefreshCw, Target } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import {
@@ -18,6 +18,7 @@ const navItems = [
   { title: "Morning", url: "/morning", icon: Sun },
   { title: "Midweek Check-in", url: "/midweek-checkin", icon: Calendar },
   { title: "Weekly Reset", url: "/weekly-reset", icon: RefreshCw },
+  { title: "Yearly Planning", url: "/yearly-planning", icon: Target },
 ];
 
 export function AppSidebar() {
@@ -38,7 +39,8 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {navItems.map((item) => {
-                const isActive = location.pathname === item.url;
+                const isActive = location.pathname === item.url || 
+                  (item.url !== "/" && location.pathname.startsWith(item.url));
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild isActive={isActive}>

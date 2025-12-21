@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { format, startOfWeek } from "date-fns";
-import { Command, Save, Loader2 } from "lucide-react";
+import { Command, Save, Loader2, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,12 +8,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Progress } from "@/components/ui/progress";
 import { SkeletonForm } from "@/components/SkeletonForm";
 import { useToast } from "@/hooks/use-toast";
 import { useHaptic } from "@/hooks/useHaptic";
 import { supabase } from "@/integrations/supabase/client";
+import WeeklyReflection from "@/components/yearly-planning/WeeklyReflection";
 
 const HARADA_PILLARS = [
   "Physical Health",
@@ -408,6 +410,25 @@ export default function WeeklyReset() {
                   I have reset my environment (cleaned workspace, organized files, prepared for the week)
                 </Label>
               </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* Yearly Planning - Weekly Reflection */}
+          <AccordionItem value="yearly-reflection" className="border rounded-lg bg-card">
+            <AccordionTrigger className="px-4 md:px-6 hover:no-underline">
+              <div className="flex items-center gap-3">
+                <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+                <h2 className="text-base md:text-lg font-semibold flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4" />
+                  Yearly Planning Reflection
+                </h2>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-4 md:px-6 pb-6">
+              <p className="text-xs md:text-sm text-muted-foreground mb-4">
+                Reflect on how well you lived your yearly theme this week
+              </p>
+              <WeeklyReflection />
             </AccordionContent>
           </AccordionItem>
         </Accordion>

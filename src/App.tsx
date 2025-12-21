@@ -28,8 +28,8 @@ const App = () => (
           <Route path="/morning" element={<AuthGuard><AppLayout><Morning /></AppLayout></AuthGuard>} />
           <Route path="/weekly-reset" element={<AuthGuard><AppLayout><WeeklyReset /></AppLayout></AuthGuard>} />
           <Route path="/midweek-checkin" element={<AuthGuard><AppLayout><MidweekCheckin /></AppLayout></AuthGuard>} />
-          {/* Yearly Planning Routes - Full screen (no AppLayout) */}
-          <Route path="/yearly-planning" element={<AuthGuard><YearlyPlanningDashboard /></AuthGuard>} />
+          {/* Yearly Planning Routes */}
+          <Route path="/yearly-planning" element={<AuthGuard><AppLayout><YearlyPlanningDashboard /></AppLayout></AuthGuard>} />
           <Route path="/yearly-planning/onboarding" element={<AuthGuard><YearlyPlanningOnboarding /></AuthGuard>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
