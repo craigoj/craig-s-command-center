@@ -31,7 +31,20 @@ export const MomentumScore = () => {
 
   const loadMomentum = async () => {
     try {
-      const { data, error } = await supabase.functions.invoke('momentum-score');
+      // Get fresh session to ensure we have a valid token
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        console.log('No session available for momentum-score');
+        setIsLoading(false);
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke('momentum-score', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
 
       if (error) throw error;
 
