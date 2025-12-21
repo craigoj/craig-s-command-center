@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   CheckCircle2, 
@@ -8,6 +7,7 @@ import {
 } from 'lucide-react';
 import DailyScorecard from './DailyScorecard';
 import WeeklyReflection from './WeeklyReflection';
+import CalendarAudit from './CalendarAudit';
 
 interface TrackingTabProps {
   yearlyPlanId?: string;
@@ -45,24 +45,9 @@ export default function TrackingTab({ yearlyPlanId, theme }: TrackingTabProps) {
           <WeeklyReflection yearlyPlanId={yearlyPlanId} theme={theme} />
         </TabsContent>
 
-        {/* Calendar Audit Placeholder */}
+        {/* Calendar Audit */}
         <TabsContent value="calendar">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-blue-500" />
-                Calendar Audit
-              </CardTitle>
-              <CardDescription>Track where your time goes</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-12 text-muted-foreground border-2 border-dashed rounded-lg">
-                <Calendar className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                <p className="text-sm mb-2">Calendar audit feature coming soon</p>
-                <p className="text-xs">Growth, Maintenance, or Escape? Know the truth.</p>
-              </div>
-            </CardContent>
-          </Card>
+          <CalendarAudit />
         </TabsContent>
       </Tabs>
     </div>
