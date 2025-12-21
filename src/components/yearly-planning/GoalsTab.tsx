@@ -36,8 +36,8 @@ import {
   PartyPopper,
   Clock,
   TrendingUp,
-  Goal
 } from 'lucide-react';
+import ConstraintsManager from './ConstraintsManager';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { format, differenceInDays, parseISO, isAfter } from 'date-fns';
@@ -371,27 +371,13 @@ export default function GoalsTab({ misogi: initialMisogi, yearlyPlanId, onMisogi
           </CardContent>
         </Card>
 
-        {/* Constraints Placeholder */}
+        {/* Constraints Manager */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.4 }}
         >
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Goal className="w-5 h-5" />
-                Constraints
-              </CardTitle>
-              <CardDescription>Rules that keep you focused</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded-lg">
-                <Goal className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                <p className="text-sm">Constraints feature coming soon</p>
-              </div>
-            </CardContent>
-          </Card>
+          <ConstraintsManager yearlyPlanId={yearlyPlanId} />
         </motion.div>
       </motion.div>
     );
@@ -642,22 +628,8 @@ export default function GoalsTab({ misogi: initialMisogi, yearlyPlanId, onMisogi
         </Card>
       )}
 
-      {/* Constraints Placeholder */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Goal className="w-5 h-5" />
-            Constraints
-          </CardTitle>
-          <CardDescription>Rules that keep you focused</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded-lg">
-            <Goal className="w-12 h-12 mx-auto mb-3 opacity-30" />
-            <p className="text-sm">Constraints feature coming soon</p>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Constraints Manager */}
+      <ConstraintsManager yearlyPlanId={yearlyPlanId} />
 
       {/* Edit Modal */}
       <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
