@@ -25,6 +25,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Progress } from '@/components/ui/progress';
 import OverviewTab from '@/components/yearly-planning/OverviewTab';
 import GoalsTab from '@/components/yearly-planning/GoalsTab';
+import TrackingTab from '@/components/yearly-planning/TrackingTab';
 
 interface YearlyPlan {
   id: string;
@@ -322,57 +323,8 @@ export default function YearlyPlanningDashboard() {
           </TabsContent>
 
           {/* Tracking Tab */}
-          <TabsContent value="tracking" className="space-y-6 animate-fade-in">
-            {/* Daily Scorecard placeholder */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-green-500" />
-                  Daily Scorecard
-                </CardTitle>
-                <CardDescription>Track your daily wins and challenges</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded-lg">
-                  <CheckCircle2 className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                  <p className="text-sm">Daily scorecard feature coming soon</p>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Weekly Reflection placeholder */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-blue-500" />
-                  Weekly Reflection
-                </CardTitle>
-                <CardDescription>15-minute Sunday review</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded-lg">
-                  <TrendingUp className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                  <p className="text-sm">Weekly reflection feature coming soon</p>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Calendar Audit placeholder */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-blue-500" />
-                  Calendar Audit
-                </CardTitle>
-                <CardDescription>Growth, Maintenance, or Escape?</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded-lg">
-                  <Calendar className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                  <p className="text-sm">Calendar audit feature coming soon</p>
-                </div>
-              </CardContent>
-            </Card>
+          <TabsContent value="tracking" className="animate-fade-in">
+            <TrackingTab />
           </TabsContent>
         </Tabs>
       </div>
