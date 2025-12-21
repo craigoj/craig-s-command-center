@@ -5,6 +5,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { 
   Target, 
   Trophy, 
   Sparkles, 
@@ -19,7 +26,8 @@ import {
   ClipboardList,
   Dumbbell,
   Brain,
-  Lightbulb
+  Lightbulb,
+  ChevronDown
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Progress } from '@/components/ui/progress';
@@ -83,6 +91,7 @@ export default function YearlyPlanningDashboard() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
+  const [availableYears, setAvailableYears] = useState<number[]>([]);
   const [data, setData] = useState<DashboardData>({
     yearlyPlan: null,
     lifeResume: [],
@@ -93,47 +102,82 @@ export default function YearlyPlanningDashboard() {
   const today = new Date();
   const currentMonth = today.getMonth(); // 0-indexed (11 = December)
   const isLateYear = currentMonth >= 10;
-  const planningYear = isLateYear ? today.getFullYear() + 1 : today.getFullYear();
-  const fallbackYear = today.getFullYear(); // Current calendar year as fallback
-  const [displayYear, setDisplayYear] = useState(planningYear);
+  const defaultPlanningYear = isLateYear ? today.getFullYear() + 1 : today.getFullYear();
+  
+  // Get selected year from URL or use default
+  const yearParam = searchParams.get('year');
+  const [selectedYear, setSelectedYear] = useState<number | null>(yearParam ? parseInt(yearParam) : null);
   const activeTab = searchParams.get('tab') || 'overview';
 
   const handleTabChange = (value: string) => {
-    setSearchParams({ tab: value });
+    const params = new URLSearchParams(searchParams);
+    params.set('tab', value);
+    setSearchParams(params);
   };
 
+  const handleYearChange = (year: string) => {
+    const yearNum = parseInt(year);
+    setSelectedYear(yearNum);
+    const params = new URLSearchParams(searchParams);
+    params.set('year', year);
+    setSearchParams(params);
+  };
+
+  // Fetch available years on mount
   useEffect(() => {
+    const fetchAvailableYears = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: plans } = await supabase
+        .from('yearly_plans')
+        .select('year')
+        .eq('user_id', user.id)
+        .order('year', { ascending: false });
+
+      if (plans && plans.length > 0) {
+        const years = plans.map(p => p.year);
+        // Add next year if we're in late year and it's not already in the list
+        if (isLateYear && !years.includes(today.getFullYear() + 1)) {
+          years.unshift(today.getFullYear() + 1);
+        }
+        setAvailableYears([...new Set(years)].sort((a, b) => b - a));
+        
+        // Set initial selected year if not set
+        if (!selectedYear) {
+          // Try to find a plan for the default planning year, otherwise use the first available
+          const hasDefaultYear = years.includes(defaultPlanningYear);
+          setSelectedYear(hasDefaultYear ? defaultPlanningYear : years[0]);
+        }
+      }
+    };
+
+    fetchAvailableYears();
+  }, [isLateYear, defaultPlanningYear]);
+
+  // Fetch data for selected year
+  useEffect(() => {
+    if (selectedYear === null) return;
+
     const fetchData = async () => {
       setLoading(true);
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
-        // First try the planning year (next year if in Nov/Dec)
-        let { data: yearlyPlan } = await supabase
+        // Fetch yearly plan for the selected year
+        const { data: yearlyPlan } = await supabase
           .from('yearly_plans')
           .select('*')
           .eq('user_id', user.id)
-          .eq('year', planningYear)
+          .eq('year', selectedYear)
           .maybeSingle();
 
-        // If no plan for planning year and we're in late year, check current year
-        if (!yearlyPlan && isLateYear) {
-          const { data: fallbackPlan } = await supabase
-            .from('yearly_plans')
-            .select('*')
-            .eq('user_id', user.id)
-            .eq('year', fallbackYear)
-            .maybeSingle();
-          yearlyPlan = fallbackPlan;
-        }
-
         if (!yearlyPlan) {
+          setData({ yearlyPlan: null, lifeResume: [], misogi: null });
           setLoading(false);
           return;
         }
-
-        setDisplayYear(yearlyPlan.year);
 
         // Fetch related data in parallel
         const [lifeResumeRes, misogiRes] = await Promise.all([
@@ -164,7 +208,7 @@ export default function YearlyPlanningDashboard() {
     };
 
     fetchData();
-  }, [planningYear, fallbackYear, isLateYear]);
+  }, [selectedYear]);
 
   // Loading state
   if (loading) {
@@ -192,7 +236,7 @@ export default function YearlyPlanningDashboard() {
           </div>
           
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight mb-2 md:mb-3">
-            Welcome to {planningYear}
+            Welcome to {defaultPlanningYear}
           </h1>
           <p className="text-muted-foreground text-base md:text-lg mb-6 md:mb-8">
             Let's build your yearly plan. It takes about 10 minutes to set your foundation for an extraordinary year.
@@ -225,9 +269,26 @@ export default function YearlyPlanningDashboard() {
         <header className="mb-4 md:mb-6">
           <div className="flex items-center justify-between gap-2">
             <div className="min-w-0 flex-1">
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight truncate">
-                {displayYear} Plan
-              </h1>
+              <div className="flex items-center gap-2 mb-1">
+                {availableYears.length > 1 ? (
+                  <Select value={selectedYear?.toString()} onValueChange={handleYearChange}>
+                    <SelectTrigger className="w-auto gap-1 text-xl sm:text-2xl md:text-3xl font-bold border-none p-0 h-auto shadow-none focus:ring-0">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableYears.map(year => (
+                        <SelectItem key={year} value={year.toString()}>
+                          {year} Plan
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight truncate">
+                    {selectedYear} Plan
+                  </h1>
+                )}
+              </div>
               <p className="text-muted-foreground text-xs sm:text-sm md:text-base truncate">
                 {themeData.emoji} {themeData.title}
               </p>
@@ -283,7 +344,7 @@ export default function YearlyPlanningDashboard() {
               <CardHeader className="pb-2 md:pb-4">
                 <CardTitle className="flex items-center gap-2 text-base md:text-lg">
                   <Target className="w-4 h-4 md:w-5 md:h-5" />
-                  {displayYear} Theme
+                  {selectedYear} Theme
                 </CardTitle>
               </CardHeader>
               <CardContent>
