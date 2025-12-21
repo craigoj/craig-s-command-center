@@ -4,12 +4,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   CheckCircle2, 
   TrendingUp, 
-  Calendar,
-  ClipboardCheck
+  Calendar
 } from 'lucide-react';
 import DailyScorecard from './DailyScorecard';
+import WeeklyReflection from './WeeklyReflection';
 
-export default function TrackingTab() {
+interface TrackingTabProps {
+  yearlyPlanId?: string;
+  theme?: string;
+}
+
+export default function TrackingTab({ yearlyPlanId, theme }: TrackingTabProps) {
   const [activeSection, setActiveSection] = useState('daily');
 
   return (
@@ -35,24 +40,9 @@ export default function TrackingTab() {
           <DailyScorecard />
         </TabsContent>
 
-        {/* Weekly Reflection Placeholder */}
+        {/* Weekly Reflection */}
         <TabsContent value="weekly">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-blue-500" />
-                Weekly Reflection
-              </CardTitle>
-              <CardDescription>15-minute Sunday review</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-12 text-muted-foreground border-2 border-dashed rounded-lg">
-                <TrendingUp className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                <p className="text-sm mb-2">Weekly reflection feature coming soon</p>
-                <p className="text-xs">Review your theme alignment and week's performance</p>
-              </div>
-            </CardContent>
-          </Card>
+          <WeeklyReflection yearlyPlanId={yearlyPlanId} theme={theme} />
         </TabsContent>
 
         {/* Calendar Audit Placeholder */}
