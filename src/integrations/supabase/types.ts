@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      calendar_events: {
+        Row: {
+          color_category: string
+          created_at: string
+          description: string | null
+          duration_minutes: number | null
+          end_date: string | null
+          id: string
+          quality_rating: number | null
+          start_date: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          color_category: string
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number | null
+          end_date?: string | null
+          id?: string
+          quality_rating?: number | null
+          start_date: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          color_category?: string
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number | null
+          end_date?: string | null
+          id?: string
+          quality_rating?: number | null
+          start_date?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       consistency_logs: {
         Row: {
           created_at: string | null
@@ -122,6 +164,39 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
           water_64oz?: boolean | null
+        }
+        Relationships: []
+      }
+      daily_scores: {
+        Row: {
+          created_at: string
+          date_score: string
+          discomfort_faced: string | null
+          hard_thing: string | null
+          id: string
+          life_resume_worthy: boolean
+          small_win: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          date_score: string
+          discomfort_faced?: string | null
+          hard_thing?: string | null
+          id?: string
+          life_resume_worthy?: boolean
+          small_win?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          date_score?: string
+          discomfort_faced?: string | null
+          hard_thing?: string | null
+          id?: string
+          life_resume_worthy?: boolean
+          small_win?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -247,6 +322,44 @@ export type Database = {
           },
         ]
       }
+      life_resume: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          items: Json
+          updated_at: string
+          user_id: string
+          yearly_plan_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          items?: Json
+          updated_at?: string
+          user_id: string
+          yearly_plan_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          items?: Json
+          updated_at?: string
+          user_id?: string
+          yearly_plan_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "life_resume_yearly_plan_id_fkey"
+            columns: ["yearly_plan_id"]
+            isOneToOne: false
+            referencedRelation: "yearly_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       midweek_checkins: {
         Row: {
           checkin_date: string
@@ -276,6 +389,109 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      misogi: {
+        Row: {
+          category: string
+          completion_percentage: number
+          created_at: string
+          daily_action_required: boolean
+          description: string | null
+          difficulty_level: number | null
+          end_date: string | null
+          id: string
+          start_date: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+          yearly_plan_id: string
+        }
+        Insert: {
+          category: string
+          completion_percentage?: number
+          created_at?: string
+          daily_action_required?: boolean
+          description?: string | null
+          difficulty_level?: number | null
+          end_date?: string | null
+          id?: string
+          start_date?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+          yearly_plan_id: string
+        }
+        Update: {
+          category?: string
+          completion_percentage?: number
+          created_at?: string
+          daily_action_required?: boolean
+          description?: string | null
+          difficulty_level?: number | null
+          end_date?: string | null
+          id?: string
+          start_date?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+          yearly_plan_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "misogi_yearly_plan_id_fkey"
+            columns: ["yearly_plan_id"]
+            isOneToOne: false
+            referencedRelation: "yearly_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      planning_constraints: {
+        Row: {
+          active: boolean
+          constraint_type: string
+          created_at: string
+          description: string | null
+          id: string
+          title: string
+          updated_at: string
+          user_id: string
+          yearly_plan_id: string
+        }
+        Insert: {
+          active?: boolean
+          constraint_type: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          title: string
+          updated_at?: string
+          user_id: string
+          yearly_plan_id: string
+        }
+        Update: {
+          active?: boolean
+          constraint_type?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+          yearly_plan_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "planning_constraints_yearly_plan_id_fkey"
+            columns: ["yearly_plan_id"]
+            isOneToOne: false
+            referencedRelation: "yearly_plans"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -501,6 +717,86 @@ export type Database = {
           wins?: string[] | null
         }
         Relationships: []
+      }
+      yearly_plans: {
+        Row: {
+          created_at: string
+          id: string
+          theme: string
+          theme_created_at: string | null
+          updated_at: string
+          user_id: string
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          theme: string
+          theme_created_at?: string | null
+          updated_at?: string
+          user_id: string
+          year: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          theme?: string
+          theme_created_at?: string | null
+          updated_at?: string
+          user_id?: string
+          year?: number
+        }
+        Relationships: []
+      }
+      yearly_weekly_reflections: {
+        Row: {
+          action_choices: string | null
+          comfort_choices: string | null
+          created_at: string
+          earned_respect: string | null
+          id: string
+          proud_of_week: boolean
+          theme_alignment_score: number | null
+          updated_at: string
+          user_id: string
+          week_start_date: string
+          yearly_plan_id: string | null
+        }
+        Insert: {
+          action_choices?: string | null
+          comfort_choices?: string | null
+          created_at?: string
+          earned_respect?: string | null
+          id?: string
+          proud_of_week?: boolean
+          theme_alignment_score?: number | null
+          updated_at?: string
+          user_id: string
+          week_start_date: string
+          yearly_plan_id?: string | null
+        }
+        Update: {
+          action_choices?: string | null
+          comfort_choices?: string | null
+          created_at?: string
+          earned_respect?: string | null
+          id?: string
+          proud_of_week?: boolean
+          theme_alignment_score?: number | null
+          updated_at?: string
+          user_id?: string
+          week_start_date?: string
+          yearly_plan_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "yearly_weekly_reflections_yearly_plan_id_fkey"
+            columns: ["yearly_plan_id"]
+            isOneToOne: false
+            referencedRelation: "yearly_plans"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
