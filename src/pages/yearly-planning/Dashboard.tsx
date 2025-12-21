@@ -415,6 +415,7 @@ export default function YearlyPlanningDashboard() {
             <TrackingTab 
               yearlyPlanId={data.yearlyPlan.id}
               theme={themeData.title}
+              misogi={data.misogi}
             />
           </TabsContent>
         </Tabs>

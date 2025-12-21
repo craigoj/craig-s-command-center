@@ -227,6 +227,56 @@ export type Database = {
         }
         Relationships: []
       }
+      epic_experiences: {
+        Row: {
+          category: string
+          completed: boolean
+          completed_date: string | null
+          created_at: string
+          description: string | null
+          id: string
+          planned_date: string | null
+          title: string
+          updated_at: string
+          user_id: string
+          yearly_plan_id: string
+        }
+        Insert: {
+          category: string
+          completed?: boolean
+          completed_date?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          planned_date?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+          yearly_plan_id: string
+        }
+        Update: {
+          category?: string
+          completed?: boolean
+          completed_date?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          planned_date?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+          yearly_plan_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "epic_experiences_yearly_plan_id_fkey"
+            columns: ["yearly_plan_id"]
+            isOneToOne: false
+            referencedRelation: "yearly_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       harada_pillars: {
         Row: {
           created_at: string | null
