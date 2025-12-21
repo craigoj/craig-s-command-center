@@ -60,9 +60,9 @@ interface DashboardData {
 }
 
 const themeLabels: Record<string, { title: string; emoji: string }> = {
-  finish_what_i_start: { title: "Finish What I Start", emoji: "🏁" },
-  evidence_over_emotion: { title: "Evidence Over Emotion", emoji: "📊" },
-  action_creates_clarity: { title: "Action Creates Clarity", emoji: "⚡" },
+  "Finish What I Start": { title: "Finish What I Start", emoji: "🏁" },
+  "Evidence Over Emotion": { title: "Evidence Over Emotion", emoji: "📊" },
+  "Action Creates Clarity": { title: "Action Creates Clarity", emoji: "⚡" },
 };
 
 const categoryIcons: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -89,10 +89,13 @@ export default function YearlyPlanningDashboard() {
     misogi: null,
   });
 
-  // Use next year for planning if we're in November or December
+  // Planning year logic: prefer next year's plan in Nov/Dec, but fall back to current year
   const today = new Date();
   const currentMonth = today.getMonth(); // 0-indexed (11 = December)
-  const currentYear = currentMonth >= 10 ? today.getFullYear() + 1 : today.getFullYear();
+  const isLateYear = currentMonth >= 10;
+  const planningYear = isLateYear ? today.getFullYear() + 1 : today.getFullYear();
+  const fallbackYear = today.getFullYear(); // Current calendar year as fallback
+  const [displayYear, setDisplayYear] = useState(planningYear);
   const activeTab = searchParams.get('tab') || 'overview';
 
   const handleTabChange = (value: string) => {
@@ -106,18 +109,31 @@ export default function YearlyPlanningDashboard() {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
-        // Fetch yearly plan
-        const { data: yearlyPlan } = await supabase
+        // First try the planning year (next year if in Nov/Dec)
+        let { data: yearlyPlan } = await supabase
           .from('yearly_plans')
           .select('*')
           .eq('user_id', user.id)
-          .eq('year', currentYear)
+          .eq('year', planningYear)
           .maybeSingle();
+
+        // If no plan for planning year and we're in late year, check current year
+        if (!yearlyPlan && isLateYear) {
+          const { data: fallbackPlan } = await supabase
+            .from('yearly_plans')
+            .select('*')
+            .eq('user_id', user.id)
+            .eq('year', fallbackYear)
+            .maybeSingle();
+          yearlyPlan = fallbackPlan;
+        }
 
         if (!yearlyPlan) {
           setLoading(false);
           return;
         }
+
+        setDisplayYear(yearlyPlan.year);
 
         // Fetch related data in parallel
         const [lifeResumeRes, misogiRes] = await Promise.all([
@@ -148,7 +164,7 @@ export default function YearlyPlanningDashboard() {
     };
 
     fetchData();
-  }, [currentYear]);
+  }, [planningYear, fallbackYear, isLateYear]);
 
   // Loading state
   if (loading) {
@@ -176,7 +192,7 @@ export default function YearlyPlanningDashboard() {
           </div>
           
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight mb-2 md:mb-3">
-            Welcome to {currentYear}
+            Welcome to {planningYear}
           </h1>
           <p className="text-muted-foreground text-base md:text-lg mb-6 md:mb-8">
             Let's build your yearly plan. It takes about 10 minutes to set your foundation for an extraordinary year.
@@ -210,7 +226,7 @@ export default function YearlyPlanningDashboard() {
           <div className="flex items-center justify-between gap-2">
             <div className="min-w-0 flex-1">
               <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight truncate">
-                {currentYear} Plan
+                {displayYear} Plan
               </h1>
               <p className="text-muted-foreground text-xs sm:text-sm md:text-base truncate">
                 {themeData.emoji} {themeData.title}
@@ -267,7 +283,7 @@ export default function YearlyPlanningDashboard() {
               <CardHeader className="pb-2 md:pb-4">
                 <CardTitle className="flex items-center gap-2 text-base md:text-lg">
                   <Target className="w-4 h-4 md:w-5 md:h-5" />
-                  {currentYear} Theme
+                  {displayYear} Theme
                 </CardTitle>
               </CardHeader>
               <CardContent>

@@ -71,7 +71,11 @@ export const LifeResumeBuilder = forwardRef<LifeResumeBuilderRef, LifeResumeBuil
       creative_impact: false,
     });
 
-    const currentYear = new Date().getFullYear();
+    // Use next year for planning if we're in November or December
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const planningYear = currentMonth >= 10 ? today.getFullYear() + 1 : today.getFullYear();
+    
     const contentRef = useRef(content);
     const yearlyPlanIdRef = useRef(yearlyPlanId);
 
@@ -107,7 +111,7 @@ export const LifeResumeBuilder = forwardRef<LifeResumeBuilderRef, LifeResumeBuil
             .from('yearly_plans')
             .select('id')
             .eq('user_id', user.id)
-            .eq('year', currentYear)
+            .eq('year', planningYear)
             .maybeSingle();
 
           if (yearlyPlan) {
@@ -152,7 +156,7 @@ export const LifeResumeBuilder = forwardRef<LifeResumeBuilderRef, LifeResumeBuil
       };
 
       loadData();
-    }, [currentYear]);
+    }, [planningYear]);
 
     // Parse text content into array of items
     const parseItems = (text: string): string[] => {
@@ -177,7 +181,7 @@ export const LifeResumeBuilder = forwardRef<LifeResumeBuilderRef, LifeResumeBuil
             .from('yearly_plans')
             .insert({
               user_id: user.id,
-              year: currentYear,
+              year: planningYear,
               theme: 'Evidence Over Emotion', // Default theme, will be updated in step 2
             })
             .select('id')
@@ -220,7 +224,7 @@ export const LifeResumeBuilder = forwardRef<LifeResumeBuilderRef, LifeResumeBuil
       } finally {
         setIsSaving(false);
       }
-    }, [currentYear]);
+    }, [planningYear]);
 
     // Expose save function via ref
     useImperativeHandle(ref, () => ({

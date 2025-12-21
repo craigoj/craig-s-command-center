@@ -55,18 +55,22 @@ export default function YearlyPlanningOnboarding() {
   const themeSelectorRef = useRef<ThemeSelectorRef>(null);
   const misogiCreatorRef = useRef<MisogiCreatorRef>(null);
 
+  // Use next year for planning if we're in November or December
+  const today = new Date();
+  const currentMonth = today.getMonth(); // 0-indexed (11 = December)
+  const planningYear = currentMonth >= 10 ? today.getFullYear() + 1 : today.getFullYear();
+
   // Load existing yearly plan data
   useEffect(() => {
     const loadYearlyPlan = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const currentYear = new Date().getFullYear();
       const { data } = await supabase
         .from('yearly_plans')
         .select('id, theme')
         .eq('user_id', user.id)
-        .eq('year', currentYear)
+        .eq('year', planningYear)
         .maybeSingle();
 
       if (data) {
@@ -79,7 +83,7 @@ export default function YearlyPlanningOnboarding() {
     };
 
     loadYearlyPlan();
-  }, []);
+  }, [planningYear]);
 
   const currentStepData = steps.find(s => s.id === currentStep)!;
   const progress = (currentStep / steps.length) * 100;
@@ -103,12 +107,11 @@ export default function YearlyPlanningOnboarding() {
         // Update yearlyPlanId after creating the plan
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
-          const currentYear = new Date().getFullYear();
           const { data } = await supabase
             .from('yearly_plans')
             .select('id')
             .eq('user_id', user.id)
-            .eq('year', currentYear)
+            .eq('year', planningYear)
             .maybeSingle();
           if (data) {
             setYearlyPlanId(data.id);

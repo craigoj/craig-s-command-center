@@ -69,17 +69,17 @@ interface OverviewTabProps {
 }
 
 const themeData: Record<string, { title: string; emoji: string; filter: string }> = {
-  finish_what_i_start: { 
+  "Finish What I Start": { 
     title: "Finish What I Start", 
     emoji: "🏁",
     filter: "Does this help me complete existing projects?"
   },
-  evidence_over_emotion: { 
+  "Evidence Over Emotion": { 
     title: "Evidence Over Emotion", 
     emoji: "📊",
     filter: "Does this create tangible evidence?"
   },
-  action_creates_clarity: { 
+  "Action Creates Clarity": { 
     title: "Action Creates Clarity", 
     emoji: "⚡",
     filter: "Can I act on this now instead of planning?"
