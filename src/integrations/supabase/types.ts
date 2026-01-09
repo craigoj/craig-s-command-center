@@ -393,22 +393,34 @@ export type Database = {
       }
       intake_items: {
         Row: {
+          auto_processed: boolean
+          classified_category: string | null
+          confidence_score: number | null
           created_at: string | null
           id: string
+          needs_review: boolean
           parsed_type: string | null
           raw_text: string
           user_id: string | null
         }
         Insert: {
+          auto_processed?: boolean
+          classified_category?: string | null
+          confidence_score?: number | null
           created_at?: string | null
           id?: string
+          needs_review?: boolean
           parsed_type?: string | null
           raw_text: string
           user_id?: string | null
         }
         Update: {
+          auto_processed?: boolean
+          classified_category?: string | null
+          confidence_score?: number | null
           created_at?: string | null
           id?: string
+          needs_review?: boolean
           parsed_type?: string | null
           raw_text?: string
           user_id?: string | null
