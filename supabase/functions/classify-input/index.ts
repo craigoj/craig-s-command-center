@@ -28,25 +28,110 @@ serve(async (req) => {
     const { data: domains } = await supabase.from('domains').select('*');
     const { data: projects } = await supabase.from('projects').select('*');
 
-    const systemPrompt = `You are an AI assistant for a personal operating system called CTRL:Craig. 
-Classify user input and extract structured information.
+    const systemPrompt = `You are an AI assistant for CTRL:Craig, a personal operating system for Craig.
 
-Available domains: ${domains?.map(d => d.name).join(', ')}
-Existing projects: ${projects?.map(p => p.name).join(', ')}
+CONTEXT ABOUT USER:
+- Works at University of Michigan on workflow automation (TeamDynamix, OCR projects)
+- Runs YouTube channel @Craigo_J focused on productivity and tech
+- Owns custom suit business
+- Training for HYROX competition
+- Multiple tech ventures: 937tech.com, ctrltechhq.com
+- Uses domains: ${domains?.map(d => d.name).join(', ') || 'SSC, Startups, Skills, Health'}
+- Active projects: ${projects?.map(p => p.name).join(', ') || 'None'}
 
-User input types:
-1. "task" - User wants to add a task
-2. "question" - User has a question or needs help
-3. "research" - User wants research or planning assistance
+PATTERN RECOGNITION:
+- TeamDynamix/OCR/university/automation = work context (SSC domain)
+- YouTube/video/content/filming = content category
+- Training/HYROX/gym/weights/running = health category
+- Business/startup/venture/client = Startups domain
+- Learning/insight/discovered/realized = learning category
+- Person names, "met with", "follow up with" = person category
 
-For tasks, extract:
-- task_name: Clear, actionable task name
-- suggested_domain: Which domain this belongs to (SSC, Startups, Skills, Health)
-- suggested_project: Existing project or suggest a new one
-- priority: 1-5 (1=highest urgency)
-- description: Brief context
+CLASSIFICATION CATEGORIES:
+1. "task" - Actionable item with clear deliverable (do X, finish Y, send Z)
+2. "project" - Larger initiative spanning multiple tasks (build X, launch Y)
+3. "person" - Reference to someone, relationship note, follow-up needed
+4. "learning" - Insight, discovery, lesson, or knowledge to remember
+5. "health" - Training log, nutrition note, health metric, peptide protocol
+6. "content" - Video idea, blog topic, social post concept
+7. "question" - Asking for information or clarification
 
-Return ONLY valid JSON, no markdown.`;
+DECISION RULES:
+- Be decisive - pick the best category even if only 70% confident
+- Set confidence < 0.7 only when truly ambiguous between categories
+- Default to "task" if it's actionable but unclear which category
+- Extract all relevant metrics from health entries (weights, times, distances)
+- Infer priority for tasks: "urgent", "ASAP", "today" = high; no indicator = medium; "sometime", "eventually" = low
+
+RESPONSE FORMAT - Return ONLY valid JSON:
+{
+  "category": "task" | "project" | "person" | "learning" | "health" | "content" | "question",
+  "confidence": 0.95,
+  "title": "concise descriptive title",
+  "extracted_data": { /* category-specific fields */ }
+}
+
+EXTRACTED DATA BY CATEGORY:
+
+For "person":
+{
+  "name": "person's full name",
+  "context": "how user knows them / their role",
+  "follow_up": "specific action needed or null",
+  "tags": ["client" | "collaborator" | "competitor" | "personal" | "university"]
+}
+
+For "learning":
+{
+  "title": "insight title",
+  "category": "AI" | "Automation" | "Business" | "Health" | "Tech",
+  "key_insight": "one-sentence takeaway",
+  "application": "how to use this insight",
+  "source": "where it came from or null"
+}
+
+For "health":
+{
+  "type": "Training" | "Nutrition" | "Peptides" | "Recovery",
+  "details": "what happened",
+  "metrics": { "weights": [], "times": [], "distances": [], "reps": [], "other": {} },
+  "reflection": "how it felt or null"
+}
+
+For "content":
+{
+  "title": "content title",
+  "type": "Video" | "Blog" | "Social",
+  "topic": "main theme",
+  "audience": "target viewer",
+  "notes": "research ideas or talking points"
+}
+
+For "task":
+{
+  "task_name": "clear actionable task name",
+  "suggested_domain": "SSC" | "Startups" | "Skills" | "Health",
+  "suggested_project": "existing project name or null",
+  "priority": "high" | "medium" | "low",
+  "due_date": "YYYY-MM-DD if mentioned, else null",
+  "description": "brief context"
+}
+
+For "project":
+{
+  "project_name": "clear project name",
+  "domain": "SSC" | "Startups" | "Skills" | "Health",
+  "status": "Active" | "Planning",
+  "next_action": "first executable step",
+  "description": "project overview"
+}
+
+For "question":
+{
+  "topic": "what the question is about",
+  "context": "relevant background",
+  "response": "helpful answer or guidance"
+}`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -60,13 +145,27 @@ Return ONLY valid JSON, no markdown.`;
           { role: 'system', content: systemPrompt },
           { role: 'user', content: input }
         ],
-        temperature: 0.7,
+        temperature: 0.3,
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
       console.error('AI gateway error:', response.status, errorText);
+      
+      if (response.status === 429) {
+        return new Response(
+          JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }),
+          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      if (response.status === 402) {
+        return new Response(
+          JSON.stringify({ error: 'AI credits exhausted. Please add credits to continue.' }),
+          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
       throw new Error(`AI gateway error: ${response.status}`);
     }
 
@@ -80,14 +179,41 @@ Return ONLY valid JSON, no markdown.`;
       // Remove markdown code blocks if present
       const cleanResponse = aiResponse.replace(/```json\n?|\n?```/g, '').trim();
       classification = JSON.parse(cleanResponse);
+      
+      // Validate required fields
+      if (!classification.category || !classification.title) {
+        throw new Error('Missing required fields');
+      }
+      
+      // Ensure confidence is a number between 0 and 1
+      if (typeof classification.confidence !== 'number') {
+        classification.confidence = 0.8;
+      }
+      classification.confidence = Math.max(0, Math.min(1, classification.confidence));
+      
+      // Validate category
+      const validCategories = ['task', 'project', 'person', 'learning', 'health', 'content', 'question'];
+      if (!validCategories.includes(classification.category)) {
+        classification.category = 'task';
+        classification.confidence = 0.5;
+      }
+      
     } catch (e) {
-      console.error('Failed to parse AI response:', aiResponse);
-      // Fallback: treat as question
+      console.error('Failed to parse AI response:', aiResponse, e);
+      // Fallback: treat as question with low confidence
       classification = {
-        type: 'question',
-        response: aiResponse
+        category: 'question',
+        confidence: 0.5,
+        title: input.substring(0, 50) + (input.length > 50 ? '...' : ''),
+        extracted_data: {
+          topic: 'unclear',
+          context: input,
+          response: 'I had trouble classifying this. Could you rephrase or provide more context?'
+        }
       };
     }
+
+    console.log('Final classification:', classification);
 
     return new Response(
       JSON.stringify(classification),
