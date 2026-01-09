@@ -56,6 +56,48 @@ export type Database = {
         }
         Relationships: []
       }
+      capture_log: {
+        Row: {
+          classified_as: string
+          confidence_score: number | null
+          corrected: boolean
+          correction_note: string | null
+          created_at: string
+          destination_id: string | null
+          destination_table: string | null
+          id: string
+          needs_review: boolean
+          raw_input: string
+          user_id: string
+        }
+        Insert: {
+          classified_as: string
+          confidence_score?: number | null
+          corrected?: boolean
+          correction_note?: string | null
+          created_at?: string
+          destination_id?: string | null
+          destination_table?: string | null
+          id?: string
+          needs_review?: boolean
+          raw_input: string
+          user_id: string
+        }
+        Update: {
+          classified_as?: string
+          confidence_score?: number | null
+          corrected?: boolean
+          correction_note?: string | null
+          created_at?: string
+          destination_id?: string | null
+          destination_table?: string | null
+          id?: string
+          needs_review?: boolean
+          raw_input?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       consistency_logs: {
         Row: {
           created_at: string | null
@@ -116,6 +158,45 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
           visualization_done?: boolean | null
+        }
+        Relationships: []
+      }
+      contacts: {
+        Row: {
+          context: string | null
+          created_at: string
+          follow_up: string | null
+          id: string
+          last_touched: string | null
+          name: string
+          notes: string | null
+          tags: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          context?: string | null
+          created_at?: string
+          follow_up?: string | null
+          id?: string
+          last_touched?: string | null
+          name: string
+          notes?: string | null
+          tags?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          context?: string | null
+          created_at?: string
+          follow_up?: string | null
+          id?: string
+          last_touched?: string | null
+          name?: string
+          notes?: string | null
+          tags?: string[] | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -366,6 +447,66 @@ export type Database = {
           {
             foreignKeyName: "knowledge_items_project_id_fkey"
             columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      learning_insights: {
+        Row: {
+          application: string | null
+          applied: boolean
+          category: string | null
+          created_at: string
+          id: string
+          key_insight: string
+          related_domain_id: string | null
+          related_project_id: string | null
+          source: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          application?: string | null
+          applied?: boolean
+          category?: string | null
+          created_at?: string
+          id?: string
+          key_insight: string
+          related_domain_id?: string | null
+          related_project_id?: string | null
+          source?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          application?: string | null
+          applied?: boolean
+          category?: string | null
+          created_at?: string
+          id?: string
+          key_insight?: string
+          related_domain_id?: string | null
+          related_project_id?: string | null
+          source?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learning_insights_related_domain_id_fkey"
+            columns: ["related_domain_id"]
+            isOneToOne: false
+            referencedRelation: "domains"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "learning_insights_related_project_id_fkey"
+            columns: ["related_project_id"]
             isOneToOne: false
             referencedRelation: "projects"
             referencedColumns: ["id"]
