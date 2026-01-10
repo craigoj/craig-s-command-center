@@ -61,6 +61,16 @@ const categories = [
   { value: "question", label: "Question", emoji: "❓" },
 ];
 
+/**
+ * CaptureReview - Review queue for AI-classified intake items.
+ * 
+ * Displays items that need human review (low confidence scores).
+ * Allows users to:
+ * - Accept AI classification and create records
+ * - Change category and re-classify
+ * - Skip items for later review
+ * - Batch operations for efficiency
+ */
 export const CaptureReview = () => {
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const [batchMode, setBatchMode] = useState(false);

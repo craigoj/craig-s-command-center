@@ -14,6 +14,14 @@ A productivity and workflow intelligence application that helps you manage tasks
 - **AI Classification**: Automatic categorization of notes, tasks, links, and ideas
 - **Context Linker**: Smart knowledge base that links relevant information to tasks
 
+### Layer 3 - Second Brain
+- **Brain Bar**: Universal AI-powered input that classifies and routes information automatically
+- **People CRM**: Track contacts, follow-ups, and relationship context
+- **Learning Insights**: Capture and apply knowledge with category tagging
+- **Capture Log**: Full audit trail of all captured information with correction support
+- **Morning Digest**: AI-generated daily briefing pulling from contacts, insights, and tasks
+- **Weekly Review**: Sunday reflection synthesizing the week's captures and patterns
+
 ## Security Overview
 
 🔒 **Enterprise-grade security**:

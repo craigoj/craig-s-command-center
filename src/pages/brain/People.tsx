@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ContactCard } from "@/components/brain/ContactCard";
 import { ContactDialog } from "@/components/brain/ContactDialog";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -29,6 +30,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/EmptyState";
 import { Plus, Search, Users, X } from "lucide-react";
 import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Contact {
   id: string;
@@ -396,17 +398,33 @@ export default function People() {
             ))}
           </div>
         ) : filteredContacts.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredContacts.map((contact) => (
-              <ContactCard
-                key={contact.id}
-                contact={contact}
-                onEdit={handleEdit}
-                onDelete={(c) => setDeletingContact(c)}
-                onMarkContacted={(c) => markContactedMutation.mutate(c.id)}
-              />
-            ))}
-          </div>
+          <ErrorBoundary>
+            <motion.div 
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <AnimatePresence mode="popLayout">
+                {filteredContacts.map((contact, index) => (
+                  <motion.div
+                    key={contact.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.2, delay: index * 0.03 }}
+                  >
+                    <ContactCard
+                      contact={contact}
+                      onEdit={handleEdit}
+                      onDelete={(c) => setDeletingContact(c)}
+                      onMarkContacted={(c) => markContactedMutation.mutate(c.id)}
+                    />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
+          </ErrorBoundary>
         ) : contacts.length === 0 ? (
           <EmptyState
             icon={Users}

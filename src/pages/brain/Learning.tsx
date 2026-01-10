@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { LearningCard } from "@/components/brain/LearningCard";
 import { LearningDialog } from "@/components/brain/LearningDialog";
 import { LinkProjectDialog } from "@/components/brain/LinkProjectDialog";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +23,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { Plus, Search, Lightbulb, CheckCircle, Clock, BarChart3 } from "lucide-react";
 import { toast } from "sonner";
 import { useConfetti } from "@/hooks/useConfetti";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface LearningInsight {
   id: string;
@@ -485,19 +487,35 @@ export default function Learning() {
             ))}
           </div>
         ) : filteredInsights.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredInsights.map((insight) => (
-              <LearningCard
-                key={insight.id}
-                insight={insight}
-                onToggleApplied={(i) =>
-                  toggleAppliedMutation.mutate({ id: i.id, applied: !i.applied })
-                }
-                onLinkProject={(i) => setLinkingInsight(i)}
-                onClick={handleEdit}
-              />
-            ))}
-          </div>
+          <ErrorBoundary>
+            <motion.div 
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <AnimatePresence mode="popLayout">
+                {filteredInsights.map((insight, index) => (
+                  <motion.div
+                    key={insight.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.2, delay: index * 0.03 }}
+                  >
+                    <LearningCard
+                      insight={insight}
+                      onToggleApplied={(i) =>
+                        toggleAppliedMutation.mutate({ id: i.id, applied: !i.applied })
+                      }
+                      onLinkProject={(i) => setLinkingInsight(i)}
+                      onClick={handleEdit}
+                    />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
+          </ErrorBoundary>
         ) : insights.length === 0 ? (
           <EmptyState
             icon={Lightbulb}
