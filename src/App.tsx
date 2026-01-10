@@ -12,6 +12,7 @@ import MidweekCheckin from "./pages/MidweekCheckin";
 import ReviewCaptures from "./pages/ReviewCaptures";
 import YearlyPlanningDashboard from "./pages/yearly-planning/Dashboard";
 import YearlyPlanningOnboarding from "./pages/yearly-planning/Onboarding";
+import BrainDashboard from "./pages/brain/Dashboard";
 import People from "./pages/brain/People";
 import Learning from "./pages/brain/Learning";
 import Log from "./pages/brain/Log";
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="/weekly-reset" element={<AuthGuard><AppLayout><WeeklyReset /></AppLayout></AuthGuard>} />
           <Route path="/midweek-checkin" element={<AuthGuard><AppLayout><MidweekCheckin /></AppLayout></AuthGuard>} />
           {/* Brain Routes */}
+          <Route path="/brain" element={<AuthGuard><AppLayout><BrainDashboard /></AppLayout></AuthGuard>} />
           <Route path="/brain/people" element={<AuthGuard><AppLayout><People /></AppLayout></AuthGuard>} />
           <Route path="/brain/learning" element={<AuthGuard><AppLayout><Learning /></AppLayout></AuthGuard>} />
           <Route path="/brain/log" element={<AuthGuard><AppLayout><Log /></AppLayout></AuthGuard>} />

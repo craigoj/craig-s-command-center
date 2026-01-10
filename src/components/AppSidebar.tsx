@@ -32,6 +32,7 @@ const navItems = [
 ];
 
 const brainItems = [
+  { title: "Overview", url: "/brain", icon: Brain, badgeKey: null },
   { title: "People", url: "/brain/people", icon: Users, badgeKey: "followUps" as const },
   { title: "Learning", url: "/brain/learning", icon: Lightbulb, badgeKey: "unapplied" as const },
   { title: "Capture Log", url: "/brain/log", icon: ListChecks, badgeKey: "needsReview" as const },
@@ -173,8 +174,9 @@ export function AppSidebar() {
               <SidebarGroupContent>
                 <SidebarMenu>
                   {brainItems.map((item) => {
-                    const isActive = location.pathname === item.url;
-                    const badgeCount = brainCounts[item.badgeKey];
+                    const isActive = location.pathname === item.url || 
+                      (item.url === "/brain" && location.pathname === "/brain");
+                    const badgeCount = item.badgeKey ? brainCounts[item.badgeKey] : 0;
                     return (
                       <SidebarMenuItem key={item.title}>
                         <SidebarMenuButton asChild isActive={isActive}>
