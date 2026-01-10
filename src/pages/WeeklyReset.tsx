@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { format, startOfWeek } from "date-fns";
-import { Command, Save, Loader2, TrendingUp } from "lucide-react";
+import { Command, Save, Loader2, TrendingUp, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,6 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useHaptic } from "@/hooks/useHaptic";
 import { supabase } from "@/integrations/supabase/client";
 import WeeklyReflection from "@/components/yearly-planning/WeeklyReflection";
+import WeeklyDigest from "@/components/yearly-planning/WeeklyDigest";
 
 const HARADA_PILLARS = [
   "Physical Health",
@@ -429,6 +430,25 @@ export default function WeeklyReset() {
                 Reflect on how well you lived your yearly theme this week
               </p>
               <WeeklyReflection />
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* Second Brain Review */}
+          <AccordionItem value="second-brain-review" className="border rounded-lg bg-card">
+            <AccordionTrigger className="px-4 md:px-6 hover:no-underline">
+              <div className="flex items-center gap-3">
+                <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+                <h2 className="text-base md:text-lg font-semibold flex items-center gap-2">
+                  <Brain className="h-4 w-4" />
+                  Second Brain Review
+                </h2>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-4 md:px-6 pb-6">
+              <p className="text-xs md:text-sm text-muted-foreground mb-4">
+                AI-powered analysis of your captures, patterns, and open loops
+              </p>
+              <WeeklyDigest />
             </AccordionContent>
           </AccordionItem>
         </Accordion>
