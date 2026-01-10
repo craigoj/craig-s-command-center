@@ -14,6 +14,7 @@ import YearlyPlanningDashboard from "./pages/yearly-planning/Dashboard";
 import YearlyPlanningOnboarding from "./pages/yearly-planning/Onboarding";
 import People from "./pages/brain/People";
 import Learning from "./pages/brain/Learning";
+import Log from "./pages/brain/Log";
 import { AuthGuard } from "./components/AuthGuard";
 import { AppLayout } from "./components/AppLayout";
 
@@ -35,6 +36,7 @@ const App = () => (
           {/* Brain Routes */}
           <Route path="/brain/people" element={<AuthGuard><AppLayout><People /></AppLayout></AuthGuard>} />
           <Route path="/brain/learning" element={<AuthGuard><AppLayout><Learning /></AppLayout></AuthGuard>} />
+          <Route path="/brain/log" element={<AuthGuard><AppLayout><Log /></AppLayout></AuthGuard>} />
           {/* Yearly Planning Routes */}
           <Route path="/yearly-planning" element={<AuthGuard><AppLayout><YearlyPlanningDashboard /></AppLayout></AuthGuard>} />
           <Route path="/yearly-planning/onboarding" element={<AuthGuard><YearlyPlanningOnboarding /></AuthGuard>} />
