@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
+import { QuickCaptureWidget } from "@/components/brain/QuickCaptureWidget";
 import { supabase } from "@/integrations/supabase/client";
 import {
   AreaChart,
@@ -284,6 +285,9 @@ export default function BrainDashboard() {
           </Button>
         </div>
       </div>
+
+      {/* Quick Capture Widget */}
+      <QuickCaptureWidget />
 
       {isEmpty ? (
         <Card className="py-16">
