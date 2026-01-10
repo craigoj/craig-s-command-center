@@ -9,6 +9,7 @@ import NotFound from "./pages/NotFound";
 import Morning from "./pages/Morning";
 import WeeklyReset from "./pages/WeeklyReset";
 import MidweekCheckin from "./pages/MidweekCheckin";
+import ReviewCaptures from "./pages/ReviewCaptures";
 import YearlyPlanningDashboard from "./pages/yearly-planning/Dashboard";
 import YearlyPlanningOnboarding from "./pages/yearly-planning/Onboarding";
 import { AuthGuard } from "./components/AuthGuard";
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/" element={<AuthGuard><AppLayout><Index /></AppLayout></AuthGuard>} />
           <Route path="/morning" element={<AuthGuard><AppLayout><Morning /></AppLayout></AuthGuard>} />
+          <Route path="/review-captures" element={<AuthGuard><AppLayout><ReviewCaptures /></AppLayout></AuthGuard>} />
           <Route path="/weekly-reset" element={<AuthGuard><AppLayout><WeeklyReset /></AppLayout></AuthGuard>} />
           <Route path="/midweek-checkin" element={<AuthGuard><AppLayout><MidweekCheckin /></AppLayout></AuthGuard>} />
           {/* Yearly Planning Routes */}
