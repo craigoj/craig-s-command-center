@@ -50,6 +50,12 @@ const captureTypes = [
 const insightCategories = ["ai", "business", "health", "tech", "automation", "other"];
 const contactTags = ["work", "personal", "family", "mentor", "client", "networking"];
 
+/**
+ * QuickCaptureWidget - Expandable widget for quickly adding contacts, insights, or notes.
+ * 
+ * Provides a streamlined interface for capturing information without leaving the dashboard.
+ * Automatically logs all captures for audit trail and invalidates relevant queries.
+ */
 export function QuickCaptureWidget() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [captureType, setCaptureType] = useState<CaptureType>("note");

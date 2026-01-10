@@ -39,6 +39,20 @@ const categoryLabels: Record<string, string> = {
   question: "Question",
 };
 
+/**
+ * BrainBar - Universal AI-powered input for the Second Brain system.
+ * 
+ * Classifies user input into categories (task, project, person, learning, etc.)
+ * using AI and automatically routes to appropriate database tables.
+ * 
+ * Features:
+ * - Real-time AI classification with confidence scores
+ * - Auto-routing for high-confidence inputs (≥70%)
+ * - Review queue for low-confidence inputs
+ * - Fix dialog for manual correction
+ * 
+ * @param onTaskCreated - Callback fired after successful record creation
+ */
 export const BrainBar = ({ onTaskCreated }: BrainBarProps) => {
   const [input, setInput] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);

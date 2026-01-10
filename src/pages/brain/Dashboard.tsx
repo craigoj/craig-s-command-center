@@ -12,7 +12,9 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { QuickCaptureWidget } from "@/components/brain/QuickCaptureWidget";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { supabase } from "@/integrations/supabase/client";
+import { motion } from "framer-motion";
 import {
   AreaChart,
   Area,
@@ -43,6 +45,16 @@ const tagColors: Record<string, string> = {
   networking: "#06b6d4",
 };
 
+/**
+ * BrainDashboard - Overview page for the Second Brain feature.
+ * 
+ * Displays:
+ * - Stats cards for contacts, insights, captures, and items needing review
+ * - 14-day activity chart showing capture trends
+ * - Knowledge breakdown with pie charts
+ * - Recent activity feed
+ * - Quick capture widget for adding new items
+ */
 export default function BrainDashboard() {
   // Fetch contacts
   const { data: contacts = [], isLoading: contactsLoading } = useQuery({
@@ -316,9 +328,14 @@ export default function BrainDashboard() {
           </CardContent>
         </Card>
       ) : (
-        <>
+        <ErrorBoundary>
           {/* Stats Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <motion.div 
+            className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
@@ -400,7 +417,7 @@ export default function BrainDashboard() {
                 )}
               </CardContent>
             </Card>
-          </div>
+          </motion.div>
 
           {/* Charts Row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -573,7 +590,7 @@ export default function BrainDashboard() {
               )}
             </CardContent>
           </Card>
-        </>
+        </ErrorBoundary>
       )}
     </div>
   );

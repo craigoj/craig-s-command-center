@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { CaptureLogTable } from "@/components/brain/CaptureLogTable";
 import { CaptureLogCards } from "@/components/brain/CaptureLogCards";
 import { FixCaptureDialog } from "@/components/brain/FixCaptureDialog";
+import { PaginationControls } from "@/components/ui/pagination-controls";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -30,6 +32,9 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { subDays } from "date-fns";
+import { motion, AnimatePresence } from "framer-motion";
+
+const ITEMS_PER_PAGE = 50;
 
 interface CaptureLog {
   id: string;
@@ -88,6 +93,7 @@ export default function Log() {
   const [confidenceFilter, setConfidenceFilter] = useState("all");
   const [sortBy, setSortBy] = useState<SortOption>("newest");
   const [fixingCapture, setFixingCapture] = useState<CaptureLog | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Fetch captures
   const { data: captures = [], isLoading } = useQuery({
@@ -180,6 +186,18 @@ export default function Log() {
         }
       });
   }, [captures, searchQuery, categoryFilter, statusFilter, confidenceFilter, sortBy]);
+
+  // Pagination
+  const totalPages = Math.ceil(filteredCaptures.length / ITEMS_PER_PAGE);
+  const paginatedCaptures = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredCaptures.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredCaptures, currentPage]);
+
+  // Reset page when filters change
+  useMemo(() => {
+    setCurrentPage(1);
+  }, [searchQuery, categoryFilter, statusFilter, confidenceFilter, dateRange]);
 
   // Fix mutation
   const fixMutation = useMutation({
@@ -518,12 +536,32 @@ export default function Log() {
               <Skeleton key={i} className="h-16 rounded-lg" />
             ))}
           </div>
-        ) : filteredCaptures.length > 0 ? (
-          isMobile ? (
-            <CaptureLogCards captures={filteredCaptures} onFix={(c) => setFixingCapture(c)} />
-          ) : (
-            <CaptureLogTable captures={filteredCaptures} onFix={(c) => setFixingCapture(c)} />
-          )
+        ) : paginatedCaptures.length > 0 ? (
+          <ErrorBoundary>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentPage}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+              >
+                {isMobile ? (
+                  <CaptureLogCards captures={paginatedCaptures} onFix={(c) => setFixingCapture(c)} />
+                ) : (
+                  <CaptureLogTable captures={paginatedCaptures} onFix={(c) => setFixingCapture(c)} />
+                )}
+              </motion.div>
+            </AnimatePresence>
+            
+            <PaginationControls
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+              itemsPerPage={ITEMS_PER_PAGE}
+              totalItems={filteredCaptures.length}
+            />
+          </ErrorBoundary>
         ) : captures.length === 0 ? (
           <EmptyState
             icon={FileText}
