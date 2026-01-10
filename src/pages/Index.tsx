@@ -13,6 +13,7 @@ import { EveningWrapUp } from "@/components/EveningWrapUp";
 import { WeeklyResetCard } from "@/components/WeeklyResetCard";
 import { MidweekCheckinCard } from "@/components/MidweekCheckinCard";
 import { ConsistencyScore } from "@/components/ConsistencyScore";
+import { SecondBrainCard } from "@/components/SecondBrainCard";
 import { MorningSuggestions } from "@/components/MorningSuggestions";
 import { TimeBasedGreeting } from "@/components/TimeBasedGreeting";
 import { EmptyState } from "@/components/EmptyState";
@@ -166,6 +167,11 @@ const Index = () => {
         <section className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 animate-fade-in" style={{ animationDelay: '0.3s' }}>
           <ConsistencyScore />
           <DailyActionsCard />
+        </section>
+
+        {/* Second Brain Summary */}
+        <section className="animate-fade-in" style={{ animationDelay: '0.35s' }}>
+          <SecondBrainCard />
         </section>
 
         {/* Evening Wrap-Up - Show 5pm-10pm */}
