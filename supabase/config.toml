@@ -26,3 +26,9 @@ verify_jwt = true
 
 [functions.morning-suggestions]
 verify_jwt = true
+
+[functions.second-brain-digest]
+verify_jwt = true
+
+[functions.stagnant-tasks]
+verify_jwt = true
